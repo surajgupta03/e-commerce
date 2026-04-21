@@ -226,6 +226,266 @@ const fallbackProducts = [
   },
 ];
 
+const fallbackProductDetails = {
+  p1: {
+    brand: "Nexa Motion",
+    highlights: [
+      "1.91-inch AMOLED display with always-on mode",
+      "Heart rate, SpO2, and sleep tracking",
+      "Up to 7 days of battery life",
+    ],
+    specifications: [
+      { label: "Display", value: "1.91-inch AMOLED" },
+      { label: "Battery", value: "Up to 7 days" },
+      { label: "Water Resistance", value: "IP68" },
+      { label: "Connectivity", value: "Bluetooth 5.3" },
+    ],
+  },
+  p2: {
+    brand: "Nexa Audio",
+    highlights: [
+      "Deep bass tuning with clear mids and highs",
+      "Memory-foam ear cushions for long listening sessions",
+      "Fast charge gives 4 hours in 15 minutes",
+    ],
+    specifications: [
+      { label: "Playback", value: "38 hours" },
+      { label: "Noise Control", value: "Passive isolation" },
+      { label: "Charging", value: "USB-C fast charging" },
+      { label: "Microphone", value: "Dual-mic calling" },
+    ],
+  },
+  p3: {
+    brand: "Nexa Slate",
+    highlights: [
+      "Large laminated display for streaming and sketching",
+      "Stereo speakers tuned for clear dialogue",
+      "Slim metal body made for travel and work",
+    ],
+    specifications: [
+      { label: "Screen", value: "11-inch 2K display" },
+      { label: "Storage", value: "128 GB" },
+      { label: "Battery", value: "10 hours mixed use" },
+      { label: "Weight", value: "490 g" },
+    ],
+  },
+  p4: {
+    brand: "Nexa Atelier",
+    highlights: [
+      "Brushed cotton fabric with a soft hand feel",
+      "Relaxed silhouette for easy layering",
+      "Clean finish buttons and reinforced seams",
+    ],
+    specifications: [
+      { label: "Fabric", value: "100% brushed cotton" },
+      { label: "Fit", value: "Relaxed fit" },
+      { label: "Care", value: "Machine wash cold" },
+      { label: "Season", value: "All-season layering" },
+    ],
+  },
+  p5: {
+    brand: "Nexa Atelier",
+    highlights: [
+      "Breathable linen blend for warm weather comfort",
+      "Tailored collar keeps the look polished",
+      "Lightweight construction for day-long wear",
+    ],
+    specifications: [
+      { label: "Fabric", value: "Linen-cotton blend" },
+      { label: "Fit", value: "Regular fit" },
+      { label: "Sleeve", value: "Full sleeve" },
+      { label: "Care", value: "Gentle machine wash" },
+    ],
+  },
+  p6: {
+    brand: "Nexa Atelier",
+    highlights: [
+      "Mid-weight denim with lived-in softness",
+      "Classic trucker styling with modern proportions",
+      "Easy layering piece for casual outfits",
+    ],
+    specifications: [
+      { label: "Fabric", value: "Premium cotton denim" },
+      { label: "Fit", value: "Structured regular fit" },
+      { label: "Closure", value: "Button front" },
+      { label: "Pockets", value: "4-pocket design" },
+    ],
+  },
+  p7: {
+    brand: "Nexa Motion",
+    highlights: [
+      "Breathable knit upper for all-day comfort",
+      "Responsive midsole cushions daily runs",
+      "Durable outsole grips pavement and treadmills",
+    ],
+    specifications: [
+      { label: "Upper", value: "Engineered knit" },
+      { label: "Midsole", value: "Responsive foam" },
+      { label: "Use", value: "Daily training" },
+      { label: "Weight", value: "Lightweight build" },
+    ],
+  },
+  p8: {
+    brand: "Nexa Motion",
+    highlights: [
+      "Slip-on construction for easy wear",
+      "Flexible sole supports light walking and commuting",
+      "Soft inner lining keeps the fit comfortable",
+    ],
+    specifications: [
+      { label: "Style", value: "Slip-on sneaker" },
+      { label: "Sole", value: "Flexible rubber sole" },
+      { label: "Upper", value: "Breathable mesh" },
+      { label: "Use", value: "Casual everyday wear" },
+    ],
+  },
+  p9: {
+    brand: "Nexa Trail",
+    highlights: [
+      "Rugged outsole built for uneven surfaces",
+      "Supportive ankle collar adds stability",
+      "Water-resistant finish for light outdoor use",
+    ],
+    specifications: [
+      { label: "Upper", value: "Water-resistant synthetic" },
+      { label: "Outsole", value: "High-traction lug sole" },
+      { label: "Support", value: "Padded ankle collar" },
+      { label: "Use", value: "Light trekking and travel" },
+    ],
+  },
+  p10: {
+    brand: "Nexa Travel",
+    highlights: [
+      "Smart organizer layout with quick-access pockets",
+      "Padded laptop sleeve for daily commute",
+      "Weather-ready shell with reinforced base",
+    ],
+    specifications: [
+      { label: "Capacity", value: "28 liters" },
+      { label: "Laptop Fit", value: "Up to 15.6-inch" },
+      { label: "Material", value: "Water-resistant polyester" },
+      { label: "Carry", value: "Padded shoulder straps" },
+    ],
+  },
+  p11: {
+    brand: "Nexa Sun",
+    highlights: [
+      "Polarized lenses reduce glare outdoors",
+      "Classic square shape suits many face types",
+      "Lightweight frame for long wear comfort",
+    ],
+    specifications: [
+      { label: "Lens", value: "Polarized UV400" },
+      { label: "Frame", value: "Lightweight acetate" },
+      { label: "Fit", value: "Medium universal fit" },
+      { label: "Included", value: "Case and cleaning cloth" },
+    ],
+  },
+  p12: {
+    brand: "Nexa Carry",
+    highlights: [
+      "Slim profile for clean everyday carry",
+      "Multiple card slots with central cash compartment",
+      "Supple leather finish that ages well",
+    ],
+    specifications: [
+      { label: "Material", value: "Genuine leather" },
+      { label: "Slots", value: "8 card slots" },
+      { label: "Profile", value: "Slim bifold" },
+      { label: "RFID", value: "Protected lining" },
+    ],
+  },
+  p13: {
+    brand: "Nexa Home",
+    highlights: [
+      "Hand-finished ceramic pieces with matte glaze",
+      "Designed for balanced pour-over extraction",
+      "Compact set ideal for modern kitchens",
+    ],
+    specifications: [
+      { label: "Pieces", value: "Dripper, server, mugs" },
+      { label: "Material", value: "Stoneware ceramic" },
+      { label: "Capacity", value: "600 ml server" },
+      { label: "Use", value: "Manual pour-over brewing" },
+    ],
+  },
+  p14: {
+    brand: "Nexa Home",
+    highlights: [
+      "Curved silhouette designed for cozy reading corners",
+      "Soft-touch upholstery with plush cushioning",
+      "Compact footprint fits apartments and studios",
+    ],
+    specifications: [
+      { label: "Frame", value: "Solid wood base" },
+      { label: "Upholstery", value: "Soft woven fabric" },
+      { label: "Assembly", value: "Minimal assembly" },
+      { label: "Use", value: "Living room and lounge" },
+    ],
+  },
+  p15: {
+    brand: "Nexa Home",
+    highlights: [
+      "Warm ambient glow for desks and bedside tables",
+      "Minimal silhouette with premium finish",
+      "Easy touch control for brightness changes",
+    ],
+    specifications: [
+      { label: "Lighting", value: "Warm LED" },
+      { label: "Control", value: "Touch dimmer" },
+      { label: "Power", value: "Plug-in" },
+      { label: "Best For", value: "Desk and bedside use" },
+    ],
+  },
+  p16: {
+    brand: "Nexa Beauty",
+    highlights: [
+      "Hydrating serum with lightweight finish",
+      "Layers smoothly under sunscreen and makeup",
+      "Daily-use formula for dull and dry skin",
+    ],
+    specifications: [
+      { label: "Skin Type", value: "Normal to dry" },
+      { label: "Texture", value: "Lightweight serum" },
+      { label: "Key Focus", value: "Hydration and glow" },
+      { label: "Routine", value: "AM and PM use" },
+    ],
+  },
+  p17: {
+    brand: "Nexa Beauty",
+    highlights: [
+      "Rich matte color with comfortable wear",
+      "Includes liner for a clean finish",
+      "Long-wear formula made for day-to-night use",
+    ],
+    specifications: [
+      { label: "Finish", value: "Soft matte" },
+      { label: "Set", value: "Lip color plus liner" },
+      { label: "Wear Time", value: "Up to 8 hours" },
+      { label: "Best For", value: "Everyday and evening looks" },
+    ],
+  },
+  p18: {
+    brand: "Nexa Beauty",
+    highlights: [
+      "Balanced cleansing and conditioning routine",
+      "Smooths strands while keeping hair manageable",
+      "Fresh herbal scent for a clean finish",
+    ],
+    specifications: [
+      { label: "Contents", value: "Shampoo and conditioner" },
+      { label: "Hair Type", value: "Normal to dry hair" },
+      { label: "Focus", value: "Strength and softness" },
+      { label: "Routine", value: "Daily hair care" },
+    ],
+  },
+};
+
+const detailedFallbackProducts = fallbackProducts.map((product) => ({
+  ...product,
+  ...(fallbackProductDetails[product._id] || {}),
+}));
+
 const shippingFee = 149;
 const freeShippingThreshold = 5000;
 const featuredOffers = [
@@ -284,6 +544,8 @@ function normalizeProduct(product) {
     ...product,
     reviews: Array.isArray(product?.reviews) ? product.reviews : [],
     rating: Number(product?.rating || 0),
+    highlights: Array.isArray(product?.highlights) ? product.highlights : [],
+    specifications: Array.isArray(product?.specifications) ? product.specifications : [],
   };
 }
 
@@ -389,11 +651,11 @@ function App() {
       const incomingProducts =
         Array.isArray(response.data) && response.data.length
           ? response.data.map(normalizeProduct)
-          : fallbackProducts.map(normalizeProduct);
+          : detailedFallbackProducts.map(normalizeProduct);
       setProducts(incomingProducts);
       setSelectedProductId((currentId) => currentId ?? incomingProducts[0]?._id ?? null);
     } catch (error) {
-      const nextProducts = fallbackProducts.map(normalizeProduct);
+      const nextProducts = detailedFallbackProducts.map(normalizeProduct);
       setProducts(nextProducts);
       setSelectedProductId((currentId) => currentId ?? nextProducts[0]?._id ?? null);
     } finally {
@@ -1030,7 +1292,7 @@ function App() {
 
             <div className="stats-grid">
               <article>
-                <strong>{products.length || fallbackProducts.length}+</strong>
+                <strong>{products.length || detailedFallbackProducts.length}+</strong>
                 <span>Products</span>
               </article>
               <article>
@@ -1578,6 +1840,37 @@ function App() {
                     <span>Stock</span>
                     <strong>{currentProductPage.stock} units</strong>
                   </article>
+                </div>
+                <div className="detail-stack">
+                  <article className="detail-card">
+                    <span>Brand</span>
+                    <strong>{currentProductPage.brand || "Nexa Store"}</strong>
+                  </article>
+
+                  {currentProductPage.highlights?.length > 0 && (
+                    <article className="detail-card">
+                      <span>Highlights</span>
+                      <ul className="detail-list">
+                        {currentProductPage.highlights.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </article>
+                  )}
+
+                  {currentProductPage.specifications?.length > 0 && (
+                    <article className="detail-card">
+                      <span>Specifications</span>
+                      <div className="spec-list">
+                        {currentProductPage.specifications.map((spec) => (
+                          <div key={`${spec.label}-${spec.value}`} className="spec-row">
+                            <strong>{spec.label}</strong>
+                            <span>{spec.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </article>
+                  )}
                 </div>
                 <button
                   type="button"

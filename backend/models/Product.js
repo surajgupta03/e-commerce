@@ -16,6 +16,17 @@ stock:Number,
 
 rating:Number,
 
+brand:String,
+
+highlights:[String],
+
+specifications:[
+{
+label:String,
+value:String
+}
+],
+
 reviews:[
 {
 userId:String,
