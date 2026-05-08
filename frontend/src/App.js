@@ -7,6 +7,23 @@ const API_BASE_URL = (
   "http://localhost:5000/api"
 ).replace(/\/$/, "");
 
+function Icon({ className = "", children, viewBox = "0 0 24 24" }) {
+  return (
+    <svg
+      className={className}
+      viewBox={viewBox}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
 const fallbackProducts = [
   {
     _id: "p1",
@@ -488,13 +505,23 @@ const detailedFallbackProducts = fallbackProducts.map((product) => ({
 
 const shippingFee = 149;
 const freeShippingThreshold = 5000;
-const featuredOffers = [
-  "Cash on Delivery available in major Indian cities",
-  "UPI, cards, and net banking ready at checkout",
-  "Easy 7-day returns on eligible items",
-];
 const adminStatusOptions = ["Confirmed", "Packed", "Shipped", "Delivered", "Cancelled"];
 const categoryOrder = ["Electronics", "Fashion", "Footwear", "Accessories", "Home", "Beauty"];
+const navMenus = {
+  Home: ["Featured", "Trending now", "Daily essentials"],
+  Shop: ["New arrivals", "Best sellers", "Weekend deals"],
+  Account: ["Your orders", "Saved items", "Rewards"],
+  Orders: ["Track package", "Delivery updates", "Support"],
+  "New Arrivals": ["Just landed", "Limited drops", "Staff picks"],
+};
+
+const navLinks = {
+  Home: "#catalog",
+  Shop: "#catalog",
+  Account: "#account",
+  Orders: "#recent-orders",
+  "New Arrivals": "#catalog",
+};
 
 const emptyRegisterState = {
   name: "",
@@ -614,6 +641,10 @@ function App() {
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [adminProductState, setAdminProductState] = useState(emptyAdminProductState);
   const [adminActionLoading, setAdminActionLoading] = useState(false);
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeNavMenu, setActiveNavMenu] = useState("");
+  const [activeCategoryPreview, setActiveCategoryPreview] = useState("Electronics");
 
   const isLoggedIn = Boolean(authToken && authUser);
   const isAdmin = authUser?.role === "admin";
@@ -856,6 +887,13 @@ function App() {
       .filter((section) => section.products.length > 0);
   }, [filteredProducts, selectedCategory]);
 
+  const heroSlides = useMemo(() => {
+    return categoryOrder
+      .map((category) => products.find((product) => product.category === category))
+      .filter(Boolean)
+      .slice(0, 5);
+  }, [products]);
+
   const selectedProduct = useMemo(() => {
     return (
       products.find((product) => product._id === selectedProductId) ??
@@ -864,6 +902,34 @@ function App() {
       null
     );
   }, [filteredProducts, products, selectedProductId]);
+
+  const activeHeroProduct = heroSlides[heroSlideIndex] || selectedProduct;
+
+  const categoryPreviewSection = useMemo(() => {
+    return (
+      categorySections.find((section) => section.category === activeCategoryPreview) ||
+      categorySections[0] ||
+      null
+    );
+  }, [activeCategoryPreview, categorySections]);
+
+  useEffect(() => {
+    if (!heroSlides.length) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setHeroSlideIndex((current) => (current + 1) % heroSlides.length);
+    }, 4500);
+
+    return () => window.clearInterval(intervalId);
+  }, [heroSlides]);
+
+  useEffect(() => {
+    if (categorySections.length && !categorySections.some((section) => section.category === activeCategoryPreview)) {
+      setActiveCategoryPreview(categorySections[0].category);
+    }
+  }, [activeCategoryPreview, categorySections]);
 
   const currentProductPage = useMemo(() => {
     if (!currentProductPageId) {
@@ -1228,107 +1294,369 @@ function App() {
   return (
     <div className="app-shell">
       <header className="hero">
-        <nav className="topbar">
-          <div>
-            <p className="eyebrow">India-ready shopping</p>
-            <h1>Nexa Store India</h1>
+        <div className="utility-bar">
+          <div className="utility-left">
+            <span>
+              <Icon className="inline-icon">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M4 7l8 6 8-6" />
+              </Icon>
+              info@nexastore.com
+            </span>
+            <span>
+              <Icon className="inline-icon">
+                <path d="M12 21s7-4.6 7-11a7 7 0 10-14 0c0 6.4 7 11 7 11z" />
+                <circle cx="12" cy="10" r="2.5" />
+              </Icon>
+              Track order
+            </span>
           </div>
-          <div className="topbar-meta">
-            <span>Curated products</span>
-            <button
-              type="button"
-              className="secondary-button topbar-button"
-              onClick={() => setShowCartPanel(true)}
-            >
-              Cart ({cartCount})
-            </button>
+          <p>Get discount 30% off your first order</p>
+          <div className="utility-right">
+            <span>INR</span>
+            <span>English</span>
             {isLoggedIn ? (
-              <>
-                <span>{`${authUser.name} (${authUser.role})`}</span>
-                <button type="button" className="secondary-button topbar-button" onClick={openAccountSection}>
-                  Account
-                </button>
-              </>
+              <button type="button" className="plain-link" onClick={openAccountSection}>
+                {authUser.name}
+              </button>
             ) : (
-              <button
-                type="button"
-                className="primary-button topbar-button"
-                onClick={() => openAuthPanel("login")}
-              >
-                Login
+              <button type="button" className="plain-link" onClick={() => openAuthPanel("login")}>
+                Login / Register
               </button>
             )}
           </div>
-        </nav>
+        </div>
 
-        <div className="hero-grid">
-          <section className="hero-copy">
-            <p className="hero-kicker">Full e-commerce experience</p>
-            <h2>Your one-stop destination for quality products and effortless shopping.</h2>
-            <p className="hero-text">
-              The storefront now includes account access, profile-aware checkout, customer order
-              history, review posting, and an admin control area for products and order statuses.
-            </p>
+        <div className="topbar">
+          <a href="#catalog" className="brand-lockup">
+            <span className="brand-mark">NS</span>
+            <div>
+              <h1>Nexa Store</h1>
+              <p>Smart deals every day</p>
+            </div>
+          </a>
 
-            <div className="hero-actions">
-              <a href="#catalog" className="primary-button">
-                Shop collection
-              </a>
-              {!isLoggedIn && (
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => openAuthPanel("register")}
-                >
-                  Create account
-                </button>
-              )}
-              {isLoggedIn && (
-                <a href="#account" className="secondary-button">
-                  Account area
+          <button
+            type="button"
+            className="mobile-menu-toggle"
+            onClick={() => setMobileMenuOpen((current) => !current)}
+            aria-label="Toggle navigation menu"
+          >
+            <Icon className="inline-icon" viewBox="0 0 20 20">
+              <path d="M3 5h14" />
+              <path d="M3 10h14" />
+              <path d="M3 15h14" />
+            </Icon>
+          </button>
+
+          <div className="search-shell">
+            <select
+              className="hero-category-select"
+              value={selectedCategory}
+              onChange={(event) => setSelectedCategory(event.target.value)}
+            >
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <input
+              className="hero-search-input"
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Enter your search key..."
+            />
+            <button type="button" className="hero-search-button">
+              Search
+            </button>
+          </div>
+
+          <div className="topbar-meta">
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowCartPanel(true)}
+              aria-label="Cart"
+            >
+              <Icon className="inline-icon" viewBox="0 0 24 24">
+                <path d="M6 7h15l-1.4 7H8.1L6 3H3" />
+                <circle cx="9" cy="19" r="1.5" />
+                <circle cx="18" cy="19" r="1.5" />
+              </Icon>
+              <span>{cartCount}</span>
+            </button>
+            <button type="button" className="icon-button" onClick={openAccountSection} aria-label="Wishlist">
+              <Icon className="inline-icon" viewBox="0 0 24 24">
+                <path d="M12 20s-7-4.4-7-10a4 4 0 017-2.7A4 4 0 0119 10c0 5.6-7 10-7 10z" />
+              </Icon>
+              <span>{isLoggedIn ? 1 : 0}</span>
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              onClick={isLoggedIn ? openAccountSection : () => openAuthPanel("login")}
+              aria-label="Account access"
+            >
+              <Icon className="inline-icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3.2" />
+                <path d="M5 20a7 7 0 0114 0" />
+              </Icon>
+              <span>{isLoggedIn ? 1 : 0}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="nav-strip">
+          <button
+            type="button"
+            className="all-categories-button"
+            onClick={() => setMobileMenuOpen((current) => !current)}
+          >
+            <Icon className="inline-icon" viewBox="0 0 20 20">
+              <path d="M3 5h14" />
+              <path d="M3 10h14" />
+              <path d="M3 15h14" />
+            </Icon>
+            All Categories
+            <Icon className="nav-chevron" viewBox="0 0 20 20">
+              <path d="M5 7l5 6 5-6" />
+            </Icon>
+          </button>
+          <nav className="main-nav">
+            {Object.entries(navMenus).map(([label, items]) => (
+              <div
+                key={label}
+                className="nav-item"
+                onMouseEnter={() => setActiveNavMenu(label)}
+                onMouseLeave={() => setActiveNavMenu("")}
+              >
+                <a href={navLinks[label]} onFocus={() => setActiveNavMenu(label)} onBlur={() => setActiveNavMenu("")}>
+                  {label}
+                  <Icon className="nav-chevron" viewBox="0 0 20 20">
+                    <path d="M5 7l5 6 5-6" />
+                  </Icon>
                 </a>
-              )}
-            </div>
-
-            <div className="stats-grid">
-              <article>
-                <strong>{products.length || detailedFallbackProducts.length}+</strong>
-                <span>Products</span>
-              </article>
-              <article>
-                <strong>{isLoggedIn ? "Live" : "Guest"}</strong>
-                <span>Account mode</span>
-              </article>
-              <article>
-                <strong>Free</strong>
-                <span>Shipping over {formatPrice(freeShippingThreshold)}</span>
-              </article>
-            </div>
-          </section>
-
-          <aside className="featured-panel">
-            {selectedProduct && (
-              <>
-                <img src={selectedProduct.image} alt={selectedProduct.name} className="featured-image" />
-                <div className="featured-content">
-                  <div className="featured-header">
-                    <span className="category-pill">{selectedProduct.category}</span>
-                    <span className="rating-pill">{selectedProduct.rating} star</span>
-                  </div>
-                  <h3>{selectedProduct.name}</h3>
-                  <p>{selectedProduct.description}</p>
-                  <div className="featured-meta">
-                    <strong>{formatPrice(selectedProduct.price)}</strong>
-                    <span>{selectedProduct.stock} pieces ready to ship</span>
-                  </div>
-                  <ul className="offer-list">
-                    {featuredOffers.map((offer) => (
-                      <li key={offer}>{offer}</li>
+                {activeNavMenu === label && (
+                  <div className="nav-flyout">
+                    {items.map((item) => (
+                      <a key={item} href={navLinks[label]} className="flyout-link">
+                        {item}
+                      </a>
                     ))}
-                  </ul>
+                  </div>
+                )}
+              </div>
+            ))}
+          </nav>
+          <div className="nav-side">
+            <span>
+              <Icon className="inline-icon" viewBox="0 0 24 24">
+                <path d="M12 3l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.7-5.2 2.7 1-5.9-4.3-4.2 5.9-.9L12 3z" />
+              </Icon>
+              Best Offer
+            </span>
+            <span>
+              <Icon className="inline-icon" viewBox="0 0 24 24">
+                <path d="M4 8l8-4 8 4v8l-8 4-8-4V8z" />
+                <path d="M12 4v16" />
+              </Icon>
+              Order Tracking
+            </span>
+          </div>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="mobile-drawer">
+            <div className="mobile-drawer-head">
+              <div>
+                <p className="eyebrow">Navigation</p>
+                <h3>Browse Nexa Store</h3>
+              </div>
+              <button
+                type="button"
+                className="secondary-button small-button"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="mobile-drawer-links">
+              {Object.keys(navMenus).map((label) => (
+                <a key={label} href={navLinks[label]} onClick={() => setMobileMenuOpen(false)}>
+                  {label}
+                </a>
+              ))}
+            </div>
+
+            <div className="mobile-drawer-categories">
+              {categories
+                .filter((category) => category !== "All")
+                .slice(0, 8)
+                .map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    className="chip"
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      setActiveCategoryPreview(category);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    {category}
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
+
+        <div className="hero-grid marketplace-hero">
+          <aside className="category-rail">
+            {categories
+              .filter((category) => category !== "All")
+              .slice(0, 8)
+              .map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={`category-rail-item ${
+                    activeCategoryPreview === category ? "category-rail-item active" : ""
+                  }`}
+                  onMouseEnter={() => setActiveCategoryPreview(category)}
+                  onFocus={() => setActiveCategoryPreview(category)}
+                  onClick={() => {
+                    setSelectedCategory(category);
+                    setActiveCategoryPreview(category);
+                  }}
+                >
+                  <span>{category}</span>
+                  <Icon className="nav-chevron" viewBox="0 0 20 20">
+                    <path d="M7 4l6 6-6 6" />
+                  </Icon>
+                </button>
+              ))}
+
+            {categoryPreviewSection && (
+              <div className="category-preview-card">
+                <p>{categoryPreviewSection.category}</p>
+                <h3>{categoryPreviewSection.products[0]?.name || "Featured picks"}</h3>
+                <span>{categoryPreviewSection.products.length} items ready to shop</span>
+                <div className="category-preview-links">
+                  {categoryPreviewSection.products.slice(0, 3).map((product) => (
+                    <button
+                      key={product._id}
+                      type="button"
+                      className="category-preview-link"
+                      onClick={() => openProductPage(product._id)}
+                    >
+                      {product.name}
+                    </button>
+                  ))}
                 </div>
+              </div>
+            )}
+          </aside>
+
+          <section className="hero-copy">
+            {activeHeroProduct && (
+              <>
+                <p className="hero-kicker">Best of month</p>
+                <h2>
+                  A premium {activeHeroProduct.category.toLowerCase()} pick built for modern everyday life.
+                </h2>
+                <p className="hero-text">
+                  Discover high-demand pieces from Nexa Store with sharp pricing, trusted quality,
+                  and doorstep delivery across your favorite categories.
+                </p>
+
+                <div className="hero-actions">
+                  <button
+                    type="button"
+                    className="primary-button"
+                    onClick={() => openProductPage(activeHeroProduct._id)}
+                  >
+                    Shop Now
+                  </button>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => addToCart(activeHeroProduct)}
+                  >
+                    Add to cart
+                  </button>
+                </div>
+
+                <div className="stats-grid">
+                  <article>
+                    <strong>{products.length || detailedFallbackProducts.length}+</strong>
+                    <span>Products</span>
+                  </article>
+                  <article>
+                    <strong>{activeHeroProduct.brand || "Nexa"}</strong>
+                    <span>Featured brand</span>
+                  </article>
+                  <article>
+                    <strong>{formatPrice(activeHeroProduct.price)}</strong>
+                    <span>Current spotlight</span>
+                  </article>
+                </div>
+
+                {heroSlides.length > 1 && (
+                  <div className="hero-slider-dots">
+                    {heroSlides.map((product, index) => (
+                      <button
+                        key={product._id}
+                        type="button"
+                        className={index === heroSlideIndex ? "hero-dot active" : "hero-dot"}
+                        onClick={() => setHeroSlideIndex(index)}
+                        aria-label={`Show ${product.name}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </>
             )}
+          </section>
+
+          <section className="hero-banner-card">
+            {activeHeroProduct && (
+              <>
+                <div className="hero-banner-copy">
+                  <span className="hero-banner-tag">{activeHeroProduct.category}</span>
+                  <h3>{activeHeroProduct.name}</h3>
+                  <p>{activeHeroProduct.description}</p>
+                  <strong>{formatPrice(activeHeroProduct.price)}</strong>
+                </div>
+                <img
+                  src={activeHeroProduct.image}
+                  alt={activeHeroProduct.name}
+                  className="hero-banner-image"
+                />
+              </>
+            )}
+          </section>
+
+          <aside className="promo-stack">
+            {recommendations.slice(0, 3).map((product) => (
+              <article key={product._id} className="promo-card">
+                <div>
+                  <p>{product.category}</p>
+                  <h3>{product.name}</h3>
+                  <span>From {formatPrice(product.price)}</span>
+                  <button
+                    type="button"
+                    className="promo-link"
+                    onClick={() => openProductPage(product._id)}
+                  >
+                    Shop Now
+                  </button>
+                </div>
+                <img src={product.image} alt={product.name} />
+              </article>
+            ))}
           </aside>
         </div>
       </header>
@@ -1597,6 +1925,9 @@ function App() {
             <div>
               <p className="eyebrow">Catalog</p>
               <h2>Shop by category</h2>
+              <p className="section-description">
+                Browse category-led collections with quick filters, best-value picks, and standout products in every aisle.
+              </p>
             </div>
             <p className="muted-text">
               {loading
@@ -2016,6 +2347,9 @@ function App() {
               <div>
                 <p className="eyebrow">Recent orders</p>
                 <h2>Latest checkouts</h2>
+                <p className="section-description">
+                  Keep a quick eye on the freshest checkout activity moving through the storefront.
+                </p>
               </div>
             </div>
 
@@ -2048,6 +2382,9 @@ function App() {
               <div>
                 <p className="eyebrow">Account</p>
                 <h2>Profile and orders</h2>
+                <p className="section-description">
+                  Manage your profile, track customer orders, and handle store operations from one hub.
+                </p>
               </div>
               <div className="panel-heading-actions">
                 {profileLoading && <span className="muted-text">Refreshing profile...</span>}
