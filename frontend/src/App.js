@@ -2,27 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API_BASE_URL = (
-  process.env.REACT_APP_API_URL ||
-  "http://localhost:5000/api"
-).replace(/\/$/, "");
-
-function Icon({ className = "", children, viewBox = "0 0 24 24" }) {
-  return (
-    <svg
-      className={className}
-      viewBox={viewBox}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {children}
-    </svg>
-  );
-}
+const API_BASE_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(
+  /\/$/,
+  ""
+);
 
 const fallbackProducts = [
   {
@@ -32,10 +15,10 @@ const fallbackProducts = [
     price: 13999,
     stock: 8,
     rating: 4.6,
-    description: "Track workouts, sleep, and notifications with a clean AMOLED display.",
+    description: "AMOLED fitness watch with sleep tracking, notifications, and a week-long battery.",
     image:
       "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Best seller",
   },
   {
     _id: "p2",
@@ -44,10 +27,10 @@ const fallbackProducts = [
     price: 10999,
     stock: 9,
     rating: 4.7,
-    description: "Rich sound, soft ear cushions, and a battery that powers a full work week.",
+    description: "Rich wireless sound with soft cushions and fast USB-C charging.",
     image:
       "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "New",
   },
   {
     _id: "p3",
@@ -56,10 +39,10 @@ const fallbackProducts = [
     price: 22999,
     stock: 6,
     rating: 4.5,
-    description: "Slim tablet for streaming, sketching, and work on the go.",
+    description: "Slim 2K tablet for streaming, sketching, reading, and work on the go.",
     image:
       "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Limited",
   },
   {
     _id: "p4",
@@ -68,10 +51,10 @@ const fallbackProducts = [
     price: 4999,
     stock: 20,
     rating: 4.5,
-    description: "Relaxed overshirt in brushed cotton for layering through every season.",
+    description: "Relaxed brushed-cotton overshirt made for clean everyday layering.",
     image:
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Editor pick",
   },
   {
     _id: "p5",
@@ -80,484 +63,107 @@ const fallbackProducts = [
     price: 3899,
     stock: 18,
     rating: 4.4,
-    description: "Breathable linen shirt tailored for warm days and crisp evenings.",
+    description: "Breathable linen blend with a crisp collar and an easy warm-weather fit.",
     image:
       "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Lightweight",
   },
   {
     _id: "p6",
-    name: "Metro Denim Jacket",
-    category: "Fashion",
-    price: 5599,
-    stock: 13,
-    rating: 4.7,
-    description: "Classic denim jacket with a soft broken-in feel from day one.",
-    image:
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
-  },
-  {
-    _id: "p7",
     name: "Aether Running Shoes",
     category: "Footwear",
     price: 7499,
     stock: 14,
     rating: 4.8,
-    description: "Lightweight knit runners built for daily miles and all-day comfort.",
+    description: "Responsive knit runners built for daily miles and all-day comfort.",
     image:
       "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Top rated",
   },
   {
-    _id: "p8",
-    name: "Drift Slip-On Sneakers",
-    category: "Footwear",
-    price: 4299,
-    stock: 16,
-    rating: 4.3,
-    description: "Easy slip-on sneakers with flexible soles for quick city runs.",
-    image:
-      "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
-  },
-  {
-    _id: "p9",
+    _id: "p7",
     name: "Terrain Trek Boots",
     category: "Footwear",
     price: 8999,
     stock: 7,
     rating: 4.7,
-    description: "Rugged ankle boots with grip-ready soles for weekend escapes.",
+    description: "Rugged ankle boots with grippy soles and a weather-ready finish.",
     image:
       "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Adventure",
   },
   {
-    _id: "p10",
+    _id: "p8",
     name: "Summit Travel Backpack",
     category: "Accessories",
     price: 6299,
     stock: 11,
     rating: 4.7,
-    description: "Weather-ready backpack with organized compartments for commuting and travel.",
+    description: "Organized 28L backpack with a laptop sleeve and reinforced base.",
     image:
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Travel ready",
   },
   {
-    _id: "p11",
+    _id: "p9",
     name: "Harbor Sunglasses",
     category: "Accessories",
     price: 2999,
     stock: 18,
     rating: 4.4,
-    description: "Classic square frames with polarized lenses and a lightweight fit.",
+    description: "Square polarized sunglasses with lightweight frames and UV400 lenses.",
     image:
       "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Polarized",
   },
   {
-    _id: "p12",
-    name: "Orbit Leather Wallet",
-    category: "Accessories",
-    price: 2499,
-    stock: 24,
-    rating: 4.6,
-    description: "Slim wallet crafted for everyday carry with smart card organization.",
-    image:
-      "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
-  },
-  {
-    _id: "p13",
+    _id: "p10",
     name: "Ceramic Brew Set",
     category: "Home",
     price: 3499,
     stock: 16,
     rating: 4.9,
-    description: "A minimalist pour-over kit designed to elevate your morning coffee ritual.",
+    description: "Minimal pour-over kit with a matte ceramic dripper, server, and mugs.",
     image:
       "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Giftable",
   },
   {
-    _id: "p14",
+    _id: "p11",
     name: "Cloud Lounge Chair",
     category: "Home",
     price: 16999,
     stock: 5,
     rating: 4.8,
-    description: "Soft sculpted seating with a compact footprint for cozy corners.",
+    description: "Soft sculpted seating for reading corners, bedrooms, and compact lounges.",
     image:
       "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Premium",
   },
   {
-    _id: "p15",
-    name: "Glow Table Lamp",
-    category: "Home",
-    price: 2799,
-    stock: 21,
-    rating: 4.5,
-    description: "Soft ambient lighting with a modern silhouette for desks and side tables.",
-    image:
-      "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
-  },
-  {
-    _id: "p16",
+    _id: "p12",
     name: "Botanical Face Serum",
     category: "Beauty",
     price: 1899,
     stock: 28,
     rating: 4.7,
-    description: "Lightweight serum with a dewy finish designed for daily hydration.",
+    description: "Light daily serum with a dewy finish designed for hydration and glow.",
     image:
       "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
-  },
-  {
-    _id: "p17",
-    name: "Velvet Matte Lip Kit",
-    category: "Beauty",
-    price: 1499,
-    stock: 31,
-    rating: 4.4,
-    description: "Long-wear lip duo with rich pigment and a comfortable matte finish.",
-    image:
-      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
-  },
-  {
-    _id: "p18",
-    name: "Herbal Hair Care Duo",
-    category: "Beauty",
-    price: 2199,
-    stock: 19,
-    rating: 4.6,
-    description: "Shampoo and conditioner pair that helps smooth and strengthen strands.",
-    image:
-      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80",
-    reviews: [],
+    badge: "Clean beauty",
   },
 ];
 
-const fallbackProductDetails = {
-  p1: {
-    brand: "Nexa Motion",
-    highlights: [
-      "1.91-inch AMOLED display with always-on mode",
-      "Heart rate, SpO2, and sleep tracking",
-      "Up to 7 days of battery life",
-    ],
-    specifications: [
-      { label: "Display", value: "1.91-inch AMOLED" },
-      { label: "Battery", value: "Up to 7 days" },
-      { label: "Water Resistance", value: "IP68" },
-      { label: "Connectivity", value: "Bluetooth 5.3" },
-    ],
-  },
-  p2: {
-    brand: "Nexa Audio",
-    highlights: [
-      "Deep bass tuning with clear mids and highs",
-      "Memory-foam ear cushions for long listening sessions",
-      "Fast charge gives 4 hours in 15 minutes",
-    ],
-    specifications: [
-      { label: "Playback", value: "38 hours" },
-      { label: "Noise Control", value: "Passive isolation" },
-      { label: "Charging", value: "USB-C fast charging" },
-      { label: "Microphone", value: "Dual-mic calling" },
-    ],
-  },
-  p3: {
-    brand: "Nexa Slate",
-    highlights: [
-      "Large laminated display for streaming and sketching",
-      "Stereo speakers tuned for clear dialogue",
-      "Slim metal body made for travel and work",
-    ],
-    specifications: [
-      { label: "Screen", value: "11-inch 2K display" },
-      { label: "Storage", value: "128 GB" },
-      { label: "Battery", value: "10 hours mixed use" },
-      { label: "Weight", value: "490 g" },
-    ],
-  },
-  p4: {
-    brand: "Nexa Atelier",
-    highlights: [
-      "Brushed cotton fabric with a soft hand feel",
-      "Relaxed silhouette for easy layering",
-      "Clean finish buttons and reinforced seams",
-    ],
-    specifications: [
-      { label: "Fabric", value: "100% brushed cotton" },
-      { label: "Fit", value: "Relaxed fit" },
-      { label: "Care", value: "Machine wash cold" },
-      { label: "Season", value: "All-season layering" },
-    ],
-  },
-  p5: {
-    brand: "Nexa Atelier",
-    highlights: [
-      "Breathable linen blend for warm weather comfort",
-      "Tailored collar keeps the look polished",
-      "Lightweight construction for day-long wear",
-    ],
-    specifications: [
-      { label: "Fabric", value: "Linen-cotton blend" },
-      { label: "Fit", value: "Regular fit" },
-      { label: "Sleeve", value: "Full sleeve" },
-      { label: "Care", value: "Gentle machine wash" },
-    ],
-  },
-  p6: {
-    brand: "Nexa Atelier",
-    highlights: [
-      "Mid-weight denim with lived-in softness",
-      "Classic trucker styling with modern proportions",
-      "Easy layering piece for casual outfits",
-    ],
-    specifications: [
-      { label: "Fabric", value: "Premium cotton denim" },
-      { label: "Fit", value: "Structured regular fit" },
-      { label: "Closure", value: "Button front" },
-      { label: "Pockets", value: "4-pocket design" },
-    ],
-  },
-  p7: {
-    brand: "Nexa Motion",
-    highlights: [
-      "Breathable knit upper for all-day comfort",
-      "Responsive midsole cushions daily runs",
-      "Durable outsole grips pavement and treadmills",
-    ],
-    specifications: [
-      { label: "Upper", value: "Engineered knit" },
-      { label: "Midsole", value: "Responsive foam" },
-      { label: "Use", value: "Daily training" },
-      { label: "Weight", value: "Lightweight build" },
-    ],
-  },
-  p8: {
-    brand: "Nexa Motion",
-    highlights: [
-      "Slip-on construction for easy wear",
-      "Flexible sole supports light walking and commuting",
-      "Soft inner lining keeps the fit comfortable",
-    ],
-    specifications: [
-      { label: "Style", value: "Slip-on sneaker" },
-      { label: "Sole", value: "Flexible rubber sole" },
-      { label: "Upper", value: "Breathable mesh" },
-      { label: "Use", value: "Casual everyday wear" },
-    ],
-  },
-  p9: {
-    brand: "Nexa Trail",
-    highlights: [
-      "Rugged outsole built for uneven surfaces",
-      "Supportive ankle collar adds stability",
-      "Water-resistant finish for light outdoor use",
-    ],
-    specifications: [
-      { label: "Upper", value: "Water-resistant synthetic" },
-      { label: "Outsole", value: "High-traction lug sole" },
-      { label: "Support", value: "Padded ankle collar" },
-      { label: "Use", value: "Light trekking and travel" },
-    ],
-  },
-  p10: {
-    brand: "Nexa Travel",
-    highlights: [
-      "Smart organizer layout with quick-access pockets",
-      "Padded laptop sleeve for daily commute",
-      "Weather-ready shell with reinforced base",
-    ],
-    specifications: [
-      { label: "Capacity", value: "28 liters" },
-      { label: "Laptop Fit", value: "Up to 15.6-inch" },
-      { label: "Material", value: "Water-resistant polyester" },
-      { label: "Carry", value: "Padded shoulder straps" },
-    ],
-  },
-  p11: {
-    brand: "Nexa Sun",
-    highlights: [
-      "Polarized lenses reduce glare outdoors",
-      "Classic square shape suits many face types",
-      "Lightweight frame for long wear comfort",
-    ],
-    specifications: [
-      { label: "Lens", value: "Polarized UV400" },
-      { label: "Frame", value: "Lightweight acetate" },
-      { label: "Fit", value: "Medium universal fit" },
-      { label: "Included", value: "Case and cleaning cloth" },
-    ],
-  },
-  p12: {
-    brand: "Nexa Carry",
-    highlights: [
-      "Slim profile for clean everyday carry",
-      "Multiple card slots with central cash compartment",
-      "Supple leather finish that ages well",
-    ],
-    specifications: [
-      { label: "Material", value: "Genuine leather" },
-      { label: "Slots", value: "8 card slots" },
-      { label: "Profile", value: "Slim bifold" },
-      { label: "RFID", value: "Protected lining" },
-    ],
-  },
-  p13: {
-    brand: "Nexa Home",
-    highlights: [
-      "Hand-finished ceramic pieces with matte glaze",
-      "Designed for balanced pour-over extraction",
-      "Compact set ideal for modern kitchens",
-    ],
-    specifications: [
-      { label: "Pieces", value: "Dripper, server, mugs" },
-      { label: "Material", value: "Stoneware ceramic" },
-      { label: "Capacity", value: "600 ml server" },
-      { label: "Use", value: "Manual pour-over brewing" },
-    ],
-  },
-  p14: {
-    brand: "Nexa Home",
-    highlights: [
-      "Curved silhouette designed for cozy reading corners",
-      "Soft-touch upholstery with plush cushioning",
-      "Compact footprint fits apartments and studios",
-    ],
-    specifications: [
-      { label: "Frame", value: "Solid wood base" },
-      { label: "Upholstery", value: "Soft woven fabric" },
-      { label: "Assembly", value: "Minimal assembly" },
-      { label: "Use", value: "Living room and lounge" },
-    ],
-  },
-  p15: {
-    brand: "Nexa Home",
-    highlights: [
-      "Warm ambient glow for desks and bedside tables",
-      "Minimal silhouette with premium finish",
-      "Easy touch control for brightness changes",
-    ],
-    specifications: [
-      { label: "Lighting", value: "Warm LED" },
-      { label: "Control", value: "Touch dimmer" },
-      { label: "Power", value: "Plug-in" },
-      { label: "Best For", value: "Desk and bedside use" },
-    ],
-  },
-  p16: {
-    brand: "Nexa Beauty",
-    highlights: [
-      "Hydrating serum with lightweight finish",
-      "Layers smoothly under sunscreen and makeup",
-      "Daily-use formula for dull and dry skin",
-    ],
-    specifications: [
-      { label: "Skin Type", value: "Normal to dry" },
-      { label: "Texture", value: "Lightweight serum" },
-      { label: "Key Focus", value: "Hydration and glow" },
-      { label: "Routine", value: "AM and PM use" },
-    ],
-  },
-  p17: {
-    brand: "Nexa Beauty",
-    highlights: [
-      "Rich matte color with comfortable wear",
-      "Includes liner for a clean finish",
-      "Long-wear formula made for day-to-night use",
-    ],
-    specifications: [
-      { label: "Finish", value: "Soft matte" },
-      { label: "Set", value: "Lip color plus liner" },
-      { label: "Wear Time", value: "Up to 8 hours" },
-      { label: "Best For", value: "Everyday and evening looks" },
-    ],
-  },
-  p18: {
-    brand: "Nexa Beauty",
-    highlights: [
-      "Balanced cleansing and conditioning routine",
-      "Smooths strands while keeping hair manageable",
-      "Fresh herbal scent for a clean finish",
-    ],
-    specifications: [
-      { label: "Contents", value: "Shampoo and conditioner" },
-      { label: "Hair Type", value: "Normal to dry hair" },
-      { label: "Focus", value: "Strength and softness" },
-      { label: "Routine", value: "Daily hair care" },
-    ],
-  },
-};
-
-const detailedFallbackProducts = fallbackProducts.map((product) => ({
-  ...product,
-  ...(fallbackProductDetails[product._id] || {}),
-}));
+const navItems = [
+  { label: "Home", route: "home" },
+  { label: "Shop", route: "shop" },
+  { label: "Cart", route: "cart" },
+  { label: "Account", route: "account" },
+  { label: "Support", route: "support" },
+];
 
 const shippingFee = 149;
 const freeShippingThreshold = 5000;
-const adminStatusOptions = ["Confirmed", "Packed", "Shipped", "Delivered", "Cancelled"];
-const categoryOrder = ["Electronics", "Fashion", "Footwear", "Accessories", "Home", "Beauty"];
-const navMenus = {
-  Home: ["Featured", "Trending now", "Daily essentials"],
-  Shop: ["New arrivals", "Best sellers", "Weekend deals"],
-  Account: ["Your orders", "Saved items", "Rewards"],
-  Orders: ["Track package", "Delivery updates", "Support"],
-  "New Arrivals": ["Just landed", "Limited drops", "Staff picks"],
-};
-
-const navLinks = {
-  Home: "#catalog",
-  Shop: "#catalog",
-  Account: "#account",
-  Orders: "#recent-orders",
-  "New Arrivals": "#catalog",
-};
-
-const emptyRegisterState = {
-  name: "",
-  email: "",
-  password: "",
-};
-
-const emptyLoginState = {
-  email: "",
-  password: "",
-};
-
-const emptyAdminProductState = {
-  name: "",
-  category: "",
-  price: "",
-  stock: "",
-  image: "",
-  description: "",
-};
-
-const emptyReviewState = {
-  rating: "5",
-  comment: "",
-};
-
-const emptyCheckoutState = {
-  name: "",
-  email: "",
-  phone: "",
-  address: "",
-  city: "",
-  state: "",
-  zip: "",
-  paymentMethod: "UPI",
-};
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("en-IN", {
@@ -566,1980 +172,614 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0,
   }).format(Number(value || 0));
 
-function normalizeProduct(product) {
-  return {
-    ...product,
-    reviews: Array.isArray(product?.reviews) ? product.reviews : [],
-    rating: Number(product?.rating || 0),
-    highlights: Array.isArray(product?.highlights) ? product.highlights : [],
-    specifications: Array.isArray(product?.specifications) ? product.specifications : [],
-  };
+function getRouteFromHash() {
+  const raw = window.location.hash.replace(/^#\/?/, "");
+  const [page = "home", id = ""] = raw.split("/");
+  return { page: page || "home", id };
 }
 
-function getProductIdFromHash() {
-  const hash = window.location.hash || "";
-  const match = hash.match(/^#\/products\/(.+)$/);
-  return match ? decodeURIComponent(match[1]) : null;
-}
-
-function getAuthHeaders(token) {
-  return token ? { Authorization: `Bearer ${token}` } : {};
+function navigate(page, id = "") {
+  window.location.hash = id ? `#/${page}/${id}` : `#/${page}`;
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
-  const [maxPriceFilter, setMaxPriceFilter] = useState("25000");
-  const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem("cart-items");
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
-  const [selectedProductId, setSelectedProductId] = useState(null);
-  const [currentProductPageId, setCurrentProductPageId] = useState(() => getProductIdFromHash());
+  const [route, setRoute] = useState(() => getRouteFromHash());
+  const [products, setProducts] = useState(fallbackProducts);
   const [loading, setLoading] = useState(true);
-  const [placingOrder, setPlacingOrder] = useState(false);
-  const [notice, setNotice] = useState("");
-  const [orderPlaced, setOrderPlaced] = useState(null);
-  const [recentOrders, setRecentOrders] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
-  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
-  const [checkoutState, setCheckoutState] = useState(() => {
-    const savedUser = localStorage.getItem("auth-user");
-    if (!savedUser) {
-      return emptyCheckoutState;
-    }
-
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
+  const [sort, setSort] = useState("featured");
+  const [wishlist, setWishlist] = useState(() => {
     try {
-      const parsedUser = JSON.parse(savedUser);
-      return {
-        ...emptyCheckoutState,
-        name: parsedUser?.name || "",
-        email: parsedUser?.email || "",
-      };
+      return JSON.parse(localStorage.getItem("wishlist-items")) || [];
     } catch {
-      return emptyCheckoutState;
+      return [];
     }
   });
-  const [authMode, setAuthMode] = useState("login");
-  const [showAuthPanel, setShowAuthPanel] = useState(false);
-  const [showCartPanel, setShowCartPanel] = useState(false);
-  const [loginState, setLoginState] = useState(emptyLoginState);
-  const [registerState, setRegisterState] = useState(emptyRegisterState);
-  const [authToken, setAuthToken] = useState(() => localStorage.getItem("auth-token") || "");
-  const [authUser, setAuthUser] = useState(() => {
-    const savedUser = localStorage.getItem("auth-user");
-    return savedUser ? JSON.parse(savedUser) : null;
+  const [cart, setCart] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("cart-items")) || [];
+    } catch {
+      return [];
+    }
   });
-  const [authLoading, setAuthLoading] = useState(false);
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [orderHistory, setOrderHistory] = useState([]);
-  const [orderHistoryLoading, setOrderHistoryLoading] = useState(false);
-  const [reviewState, setReviewState] = useState(emptyReviewState);
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [adminProductState, setAdminProductState] = useState(emptyAdminProductState);
-  const [adminActionLoading, setAdminActionLoading] = useState(false);
-  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeNavMenu, setActiveNavMenu] = useState("");
-  const [activeCategoryPreview, setActiveCategoryPreview] = useState("Electronics");
+  const [customer, setCustomer] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    payment: "UPI",
+  });
+  const [order, setOrder] = useState(null);
 
-  const isLoggedIn = Boolean(authToken && authUser);
-  const isAdmin = authUser?.role === "admin";
+  useEffect(() => {
+    const syncRoute = () => setRoute(getRouteFromHash());
+    window.addEventListener("hashchange", syncRoute);
+    return () => window.removeEventListener("hashchange", syncRoute);
+  }, []);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/products`);
+        const data = Array.isArray(response.data) ? response.data : response.data?.products;
+        if (Array.isArray(data) && data.length > 0) {
+          setProducts(data.map((product) => ({ ...product, badge: product.badge || "Featured" })));
+        }
+      } catch {
+        setProducts(fallbackProducts);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("cart-items", JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
-    if (authToken) {
-      localStorage.setItem("auth-token", authToken);
-    } else {
-      localStorage.removeItem("auth-token");
-    }
-  }, [authToken]);
-
-  useEffect(() => {
-    if (authUser) {
-      localStorage.setItem("auth-user", JSON.stringify(authUser));
-      setCheckoutState((current) => ({
-        ...current,
-        name: current.name || authUser.name || "",
-        email: current.email || authUser.email || "",
-      }));
-    } else {
-      localStorage.removeItem("auth-user");
-    }
-  }, [authUser]);
-
-  async function loadProducts() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/products`, {
-        timeout: 3000,
-      });
-      const incomingProducts =
-        Array.isArray(response.data) && response.data.length
-          ? response.data.map(normalizeProduct)
-          : detailedFallbackProducts.map(normalizeProduct);
-      setProducts(incomingProducts);
-      setSelectedProductId((currentId) => currentId ?? incomingProducts[0]?._id ?? null);
-    } catch (error) {
-      const nextProducts = detailedFallbackProducts.map(normalizeProduct);
-      setProducts(nextProducts);
-      setSelectedProductId((currentId) => currentId ?? nextProducts[0]?._id ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadRecentOrders() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/orders/recent?limit=3`, {
-        timeout: 3000,
-      });
-      setRecentOrders(Array.isArray(response.data) ? response.data.slice(0, 3) : []);
-    } catch (error) {
-      setRecentOrders([]);
-    }
-  }
-
-  async function loadOrderHistory(token, user) {
-    if (!token || !user) {
-      setOrderHistory([]);
-      return;
-    }
-
-    setOrderHistoryLoading(true);
-
-    try {
-      const response = await axios.get(`${API_BASE_URL}/orders`, {
-        headers: getAuthHeaders(token),
-        timeout: 4000,
-      });
-      setOrderHistory(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      setOrderHistory([]);
-      showNotice(error.response?.data?.message || "Could not load order history");
-    } finally {
-      setOrderHistoryLoading(false);
-    }
-  }
-
-  async function loadProfile(token) {
-    if (!token) {
-      setAuthUser(null);
-      return;
-    }
-
-    setProfileLoading(true);
-
-    try {
-      const response = await axios.get(`${API_BASE_URL}/users/me`, {
-        headers: getAuthHeaders(token),
-        timeout: 4000,
-      });
-      setAuthUser(response.data);
-    } catch (error) {
-      setAuthToken("");
-      setAuthUser(null);
-      setOrderHistory([]);
-      showNotice("Your session expired. Please sign in again");
-    } finally {
-      setProfileLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadProducts();
-    loadRecentOrders();
-  }, []);
-
-  useEffect(() => {
-    function syncProductPageFromHash() {
-      setCurrentProductPageId(getProductIdFromHash());
-    }
-
-    window.addEventListener("hashchange", syncProductPageFromHash);
-    syncProductPageFromHash();
-
-    return () => window.removeEventListener("hashchange", syncProductPageFromHash);
-  }, []);
-
-  useEffect(() => {
-    if (currentProductPageId) {
-      setSelectedProductId(currentProductPageId);
-    }
-  }, [currentProductPageId]);
-
-  useEffect(() => {
-    if (authToken && !authUser) {
-      loadProfile(authToken);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken, authUser]);
-
-  useEffect(() => {
-    if (authToken && authUser) {
-      loadOrderHistory(authToken, authUser);
-    } else {
-      setOrderHistory([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken, authUser]);
-
-  useEffect(() => {
-    async function loadRecommendations() {
-      if (!selectedProductId) {
-        setRecommendations([]);
-        return;
-      }
-
-      setRecommendationsLoading(true);
-
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/products/${selectedProductId}/recommendations?limit=4`,
-          { timeout: 3000 }
-        );
-        setRecommendations(
-          Array.isArray(response.data) ? response.data.map(normalizeProduct) : []
-        );
-      } catch (error) {
-        const selectedProduct = products.find((product) => product._id === selectedProductId);
-        const fallbackRecommendationList = products
-          .filter((product) => product._id !== selectedProductId)
-          .sort((a, b) => {
-            const categoryScoreA = a.category === selectedProduct?.category ? 1 : 0;
-            const categoryScoreB = b.category === selectedProduct?.category ? 1 : 0;
-
-            if (categoryScoreA !== categoryScoreB) {
-              return categoryScoreB - categoryScoreA;
-            }
-
-            return (b.rating || 0) - (a.rating || 0);
-          })
-          .slice(0, 4);
-
-        setRecommendations(fallbackRecommendationList);
-      } finally {
-        setRecommendationsLoading(false);
-      }
-    }
-
-    loadRecommendations();
-  }, [products, selectedProductId]);
+    localStorage.setItem("wishlist-items", JSON.stringify(wishlist));
+  }, [wishlist]);
 
   const categories = useMemo(
-    () => ["All", ...new Set(products.map((product) => product.category).filter(Boolean))],
+    () => ["All", ...Array.from(new Set(products.map((product) => product.category))).sort()],
     [products]
   );
 
-  const filteredProducts = useMemo(() => {
-    const visibleProducts = products.filter((product) => {
-      const matchesCategory =
-        selectedCategory === "All" || product.category === selectedCategory;
-      const matchesSearch = [product.name, product.category, product.description]
-        .join(" ")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const withinPrice = Number(product.price || 0) <= Number(maxPriceFilter || Infinity);
-      const matchesFeatured = !featuredOnly || Number(product.rating || 0) >= 4.5;
-
-      return matchesCategory && matchesSearch && withinPrice && matchesFeatured;
+  const visibleProducts = useMemo(() => {
+    const filtered = products.filter((product) => {
+      const text = `${product.name} ${product.category} ${product.description}`.toLowerCase();
+      const matchesQuery = text.includes(query.trim().toLowerCase());
+      const matchesCategory = category === "All" || product.category === category;
+      return matchesQuery && matchesCategory;
     });
 
-    const sortedProducts = [...visibleProducts];
+    return [...filtered].sort((a, b) => {
+      if (sort === "price-low") return Number(a.price) - Number(b.price);
+      if (sort === "price-high") return Number(b.price) - Number(a.price);
+      if (sort === "rating") return Number(b.rating || 0) - Number(a.rating || 0);
+      return Number(b.rating || 0) - Number(a.rating || 0);
+    });
+  }, [category, products, query, sort]);
 
-    switch (sortBy) {
-      case "price_asc":
-        sortedProducts.sort((a, b) => a.price - b.price);
-        break;
-      case "price_desc":
-        sortedProducts.sort((a, b) => b.price - a.price);
-        break;
-      case "rating_desc":
-        sortedProducts.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
-      case "name_asc":
-        sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      default:
-        sortedProducts.sort(
-          (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-        );
-        break;
-    }
+  const featuredProducts = useMemo(
+    () => [...products].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 4),
+    [products]
+  );
 
-    return sortedProducts;
-  }, [featuredOnly, maxPriceFilter, products, searchQuery, selectedCategory, sortBy]);
+  const selectedProduct = useMemo(
+    () => products.find((product) => product._id === route.id) || products[0],
+    [products, route.id]
+  );
 
-  const categorySections = useMemo(() => {
-    const availableCategories =
-      selectedCategory === "All" ? categoryOrder : [selectedCategory];
-
-    return availableCategories
-      .map((category) => ({
-        category,
-        products: filteredProducts.filter((product) => product.category === category),
-      }))
-      .filter((section) => section.products.length > 0);
-  }, [filteredProducts, selectedCategory]);
-
-  const heroSlides = useMemo(() => {
-    return categoryOrder
-      .map((category) => products.find((product) => product.category === category))
-      .filter(Boolean)
-      .slice(0, 5);
-  }, [products]);
-
-  const selectedProduct = useMemo(() => {
-    return (
-      products.find((product) => product._id === selectedProductId) ??
-      filteredProducts[0] ??
-      products[0] ??
-      null
-    );
-  }, [filteredProducts, products, selectedProductId]);
-
-  const activeHeroProduct = heroSlides[heroSlideIndex] || selectedProduct;
-
-  const categoryPreviewSection = useMemo(() => {
-    return (
-      categorySections.find((section) => section.category === activeCategoryPreview) ||
-      categorySections[0] ||
-      null
-    );
-  }, [activeCategoryPreview, categorySections]);
-
-  useEffect(() => {
-    if (!heroSlides.length) {
-      return undefined;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setHeroSlideIndex((current) => (current + 1) % heroSlides.length);
-    }, 4500);
-
-    return () => window.clearInterval(intervalId);
-  }, [heroSlides]);
-
-  useEffect(() => {
-    if (categorySections.length && !categorySections.some((section) => section.category === activeCategoryPreview)) {
-      setActiveCategoryPreview(categorySections[0].category);
-    }
-  }, [activeCategoryPreview, categorySections]);
-
-  const currentProductPage = useMemo(() => {
-    if (!currentProductPageId) {
-      return null;
-    }
-
-    return products.find((product) => String(product._id) === String(currentProductPageId)) ?? null;
-  }, [currentProductPageId, products]);
-
-  const isProductPage = Boolean(currentProductPageId);
-
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
   const shipping = cart.length === 0 || subtotal >= freeShippingThreshold ? 0 : shippingFee;
   const total = subtotal + shipping;
-
-  function showNotice(message) {
-    setNotice(message);
-    window.clearTimeout(showNotice.timeoutId);
-    showNotice.timeoutId = window.setTimeout(() => setNotice(""), 3000);
-  }
-
-  function updateProductInState(updatedProduct) {
-    const normalized = normalizeProduct(updatedProduct);
-    setProducts((currentProducts) =>
-      currentProducts.map((product) =>
-        product._id === normalized._id ? normalized : product
-      )
-    );
-    setRecommendations((currentRecommendations) =>
-      currentRecommendations.map((product) =>
-        product._id === normalized._id ? normalized : product
-      )
-    );
-  }
-
-  function openProductPage(productId) {
-    setSelectedProductId(productId);
-    window.location.hash = `#/products/${encodeURIComponent(productId)}`;
-  }
-
-  function closeProductPage() {
-    window.location.hash = "#/";
-  }
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   function addToCart(product) {
-    setCart((currentCart) => {
-      const existingItem = currentCart.find((item) => item._id === product._id);
-
-      if (existingItem) {
-        return currentCart.map((item) =>
-          item._id === product._id
-            ? { ...item, quantity: Math.min(item.quantity + 1, product.stock || 99) }
-            : item
+    setCart((current) => {
+      const existing = current.find((item) => item._id === product._id);
+      if (existing) {
+        return current.map((item) =>
+          item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-
-      return [...currentCart, { ...product, quantity: 1 }];
+      return [...current, { ...product, quantity: 1 }];
     });
-
-    showNotice(`${product.name} added to cart`);
   }
 
-  function updateQuantity(productId, nextQuantity) {
-    if (nextQuantity <= 0) {
-      setCart((currentCart) => currentCart.filter((item) => item._id !== productId));
-      return;
-    }
-
-    setCart((currentCart) =>
-      currentCart.map((item) =>
-        item._id === productId
-          ? { ...item, quantity: Math.min(nextQuantity, item.stock || 99) }
-          : item
-      )
+  function updateQuantity(productId, quantity) {
+    setCart((current) =>
+      current
+        .map((item) => (item._id === productId ? { ...item, quantity } : item))
+        .filter((item) => item.quantity > 0)
     );
   }
 
-  function handleCheckoutChange(event) {
-    const { name, value } = event.target;
-    setCheckoutState((current) => ({ ...current, [name]: value }));
+  function toggleWishlist(productId) {
+    setWishlist((current) =>
+      current.includes(productId)
+        ? current.filter((item) => item !== productId)
+        : [...current, productId]
+    );
   }
 
-  function handleLoginChange(event) {
-    const { name, value } = event.target;
-    setLoginState((current) => ({ ...current, [name]: value }));
-  }
-
-  function handleRegisterChange(event) {
-    const { name, value } = event.target;
-    setRegisterState((current) => ({ ...current, [name]: value }));
-  }
-
-  function handleReviewChange(event) {
-    const { name, value } = event.target;
-    setReviewState((current) => ({ ...current, [name]: value }));
-  }
-
-  function handleAdminProductChange(event) {
-    const { name, value } = event.target;
-    setAdminProductState((current) => ({ ...current, [name]: value }));
-  }
-
-  async function handleLoginSubmit(event) {
+  function handleCheckout(event) {
     event.preventDefault();
-    setAuthLoading(true);
+    if (cart.length === 0) return;
 
-    try {
-      const response = await axios.post(`${API_BASE_URL}/users/login`, loginState, {
-        timeout: 4000,
-      });
-      setAuthToken(response.data.token);
-      setAuthUser(response.data.user);
-      setShowAuthPanel(false);
-      setLoginState(emptyLoginState);
-      showNotice(`Welcome back, ${response.data.user.name}`);
-    } catch (error) {
-      showNotice(error.response?.data?.message || "Login failed");
-    } finally {
-      setAuthLoading(false);
-    }
-  }
-
-  async function handleRegisterSubmit(event) {
-    event.preventDefault();
-    setAuthLoading(true);
-
-    try {
-      await axios.post(`${API_BASE_URL}/users/register`, registerState, {
-        timeout: 4000,
-      });
-      showNotice("Account created. Please sign in");
-      setRegisterState(emptyRegisterState);
-      setAuthMode("login");
-      setLoginState({
-        email: registerState.email,
-        password: "",
-      });
-    } catch (error) {
-      showNotice(error.response?.data?.message || "Registration failed");
-    } finally {
-      setAuthLoading(false);
-    }
-  }
-
-  function handleLogout() {
-    setAuthToken("");
-    setAuthUser(null);
-    setOrderHistory([]);
-    showNotice("You have been signed out");
-  }
-
-  function openAuthPanel(nextMode = "login") {
-    setAuthMode(nextMode);
-    setShowAuthPanel(true);
-  }
-
-  function openAccountSection() {
-    document.getElementById("account")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  async function handleCheckoutSubmit(event) {
-    event.preventDefault();
-
-    const hasEmptyField = Object.entries(checkoutState).some(([key, value]) => {
-      if (key === "paymentMethod") {
-        return false;
-      }
-
-      return !value.trim();
-    });
-
-    if (hasEmptyField || cart.length === 0) {
-      showNotice("Complete the checkout form and keep at least one item in your cart");
-      return;
-    }
-
-    const orderPayload = {
-      items: cart.map((item) => ({
-        productId: item._id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.image,
-      })),
-      subtotal,
-      shipping,
+    setOrder({
+      number: `NX-${Date.now().toString().slice(-6)}`,
       total,
-      paymentMethod: checkoutState.paymentMethod,
-      customer: {
-        name: checkoutState.name,
-        email: checkoutState.email,
-        phone: checkoutState.phone,
-      },
-      shippingAddress: {
-        address: checkoutState.address,
-        city: checkoutState.city,
-        state: checkoutState.state,
-        zip: checkoutState.zip,
-        country: "India",
-      },
-    };
-
-    setPlacingOrder(true);
-
-    try {
-      const response = await axios.post(`${API_BASE_URL}/orders`, orderPayload, {
-        timeout: 4000,
-      });
-      const savedOrder = response.data;
-      setCart([]);
-      setOrderPlaced(savedOrder);
-      setRecentOrders((currentOrders) => [savedOrder, ...currentOrders].slice(0, 3));
-      setCheckoutState((current) => ({
-        ...emptyCheckoutState,
-        name: authUser?.name || current.name,
-        email: authUser?.email || current.email,
-      }));
-      showNotice("Order placed successfully");
-
-      await loadProducts();
-      if (authToken && authUser) {
-        await loadOrderHistory(authToken, authUser);
-      }
-    } catch (error) {
-      showNotice(error.response?.data?.message || "Order service is not reachable right now");
-    } finally {
-      setPlacingOrder(false);
-    }
+      items: cart,
+      customer,
+      date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+    });
+    setCart([]);
+    navigate("account");
   }
 
-  async function handleReviewSubmit(event) {
-    event.preventDefault();
-    const reviewTargetProduct = currentProductPage || selectedProduct;
+  function ProductCard({ product }) {
+    const saved = wishlist.includes(product._id);
 
-    if (!reviewTargetProduct || !authToken) {
-      showNotice("Sign in to leave a review");
-      return;
-    }
-
-    setReviewSubmitting(true);
-
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/products/${reviewTargetProduct._id}/reviews`,
-        {
-          rating: Number(reviewState.rating),
-          comment: reviewState.comment,
-        },
-        {
-          headers: getAuthHeaders(authToken),
-          timeout: 4000,
-        }
-      );
-      updateProductInState(response.data);
-      setReviewState(emptyReviewState);
-      showNotice("Review added");
-    } catch (error) {
-      showNotice(error.response?.data?.message || "Could not submit review");
-    } finally {
-      setReviewSubmitting(false);
-    }
-  }
-
-  async function handleAdminProductSubmit(event) {
-    event.preventDefault();
-
-    if (!authToken || !isAdmin) {
-      showNotice("Admin access required");
-      return;
-    }
-
-    setAdminActionLoading(true);
-
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/products`,
-        {
-          ...adminProductState,
-          price: Number(adminProductState.price),
-          stock: Number(adminProductState.stock),
-        },
-        {
-          headers: getAuthHeaders(authToken),
-          timeout: 4000,
-        }
-      );
-      setProducts((currentProducts) => [normalizeProduct(response.data), ...currentProducts]);
-      setAdminProductState(emptyAdminProductState);
-      showNotice("Product created");
-    } catch (error) {
-      showNotice(error.response?.data?.message || "Could not create product");
-    } finally {
-      setAdminActionLoading(false);
-    }
-  }
-
-  async function handleDeleteProduct(productId) {
-    if (!authToken || !isAdmin) {
-      showNotice("Admin access required");
-      return;
-    }
-
-    setAdminActionLoading(true);
-
-    try {
-      await axios.delete(`${API_BASE_URL}/products/${productId}`, {
-        headers: getAuthHeaders(authToken),
-        timeout: 4000,
-      });
-      setProducts((currentProducts) => currentProducts.filter((product) => product._id !== productId));
-      setRecommendations((currentRecommendations) =>
-        currentRecommendations.filter((product) => product._id !== productId)
-      );
-      setCart((currentCart) => currentCart.filter((item) => item._id !== productId));
-      if (selectedProductId === productId) {
-        setSelectedProductId(null);
-      }
-      if (currentProductPageId === productId) {
-        closeProductPage();
-      }
-      showNotice("Product deleted");
-    } catch (error) {
-      showNotice(error.response?.data?.message || "Could not delete product");
-    } finally {
-      setAdminActionLoading(false);
-    }
-  }
-
-  async function handleStatusChange(orderId, nextStatus) {
-    if (!authToken || !isAdmin) {
-      showNotice("Admin access required");
-      return;
-    }
-
-    try {
-      const response = await axios.patch(
-        `${API_BASE_URL}/orders/${orderId}/status`,
-        { status: nextStatus },
-        {
-          headers: getAuthHeaders(authToken),
-          timeout: 4000,
-        }
-      );
-      const updatedOrder = response.data;
-      setOrderHistory((currentOrders) =>
-        currentOrders.map((order) => (order._id === updatedOrder._id ? updatedOrder : order))
-      );
-      setRecentOrders((currentOrders) =>
-        currentOrders.map((order) =>
-          (order._id || order.orderNumber) === (updatedOrder._id || updatedOrder.orderNumber)
-            ? updatedOrder
-            : order
-        )
-      );
-      showNotice(`Order marked ${nextStatus}`);
-    } catch (error) {
-      showNotice(error.response?.data?.message || "Could not update order status");
-    }
-  }
-
-  return (
-    <div className="app-shell">
-      <header className="hero">
-        <div className="utility-bar">
-          <div className="utility-left">
-            <span>
-              <Icon className="inline-icon">
-                <rect x="3" y="5" width="18" height="14" rx="2" />
-                <path d="M4 7l8 6 8-6" />
-              </Icon>
-              info@nexastore.com
-            </span>
-            <span>
-              <Icon className="inline-icon">
-                <path d="M12 21s7-4.6 7-11a7 7 0 10-14 0c0 6.4 7 11 7 11z" />
-                <circle cx="12" cy="10" r="2.5" />
-              </Icon>
-              Track order
-            </span>
+    return (
+      <article className="product-card">
+        <button className="wishlist-button" type="button" onClick={() => toggleWishlist(product._id)}>
+          {saved ? "Saved" : "Save"}
+        </button>
+        <button className="product-media" type="button" onClick={() => navigate("product", product._id)}>
+          <img src={product.image} alt={product.name} />
+          <span>{product.badge || "Featured"}</span>
+        </button>
+        <div className="product-copy">
+          <div className="product-meta">
+            <span>{product.category}</span>
+            <strong>{Number(product.rating || 0).toFixed(1)}</strong>
           </div>
-          <p>Get discount 30% off your first order</p>
-          <div className="utility-right">
-            <span>INR</span>
-            <span>English</span>
-            {isLoggedIn ? (
-              <button type="button" className="plain-link" onClick={openAccountSection}>
-                {authUser.name}
-              </button>
-            ) : (
-              <button type="button" className="plain-link" onClick={() => openAuthPanel("login")}>
-                Login / Register
-              </button>
-            )}
+          <h3>{product.name}</h3>
+          <p>{product.description}</p>
+          <div className="product-footer">
+            <strong>{formatPrice(product.price)}</strong>
+            <button type="button" className="primary-button small" onClick={() => addToCart(product)}>
+              Add
+            </button>
           </div>
         </div>
+      </article>
+    );
+  }
 
-        <div className="topbar">
-          <a href="#catalog" className="brand-lockup">
-            <span className="brand-mark">NS</span>
-            <div>
-              <h1>Nexa Store</h1>
-              <p>Smart deals every day</p>
-            </div>
-          </a>
-
-          <button
-            type="button"
-            className="mobile-menu-toggle"
-            onClick={() => setMobileMenuOpen((current) => !current)}
-            aria-label="Toggle navigation menu"
-          >
-            <Icon className="inline-icon" viewBox="0 0 20 20">
-              <path d="M3 5h14" />
-              <path d="M3 10h14" />
-              <path d="M3 15h14" />
-            </Icon>
-          </button>
-
-          <div className="search-shell">
-            <select
-              className="hero-category-select"
-              value={selectedCategory}
-              onChange={(event) => setSelectedCategory(event.target.value)}
+  function Header() {
+    return (
+      <header className="site-header">
+        <a className="brand" href="#/home" onClick={() => navigate("home")}>
+          <span>N</span>
+          <div>
+            <strong>Nexa Store</strong>
+            <small>Modern essentials</small>
+          </div>
+        </a>
+        <nav className="nav-links" aria-label="Main navigation">
+          {navItems.map((item) => (
+            <button
+              key={item.route}
+              className={route.page === item.route ? "active" : ""}
+              type="button"
+              onClick={() => navigate(item.route)}
             >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <div className="header-actions">
+          <button type="button" className="ghost-button" onClick={() => navigate("shop")}>
+            Browse
+          </button>
+          <button type="button" className="cart-button" onClick={() => navigate("cart")}>
+            Cart <span>{cartCount}</span>
+          </button>
+        </div>
+      </header>
+    );
+  }
+
+  function HomePage() {
+    const heroProduct = featuredProducts[0] || products[0];
+
+    return (
+      <>
+        <section className="hero-section">
+          <div className="hero-copy">
+            <span className="eyebrow">Curated marketplace</span>
+            <h1>Shop smarter with a store that feels alive.</h1>
+            <p>
+              Discover polished essentials across tech, fashion, home, beauty, and travel with
+              quick filters, wishlist saves, and a clean checkout flow.
+            </p>
+            <div className="hero-actions">
+              <button type="button" className="primary-button" onClick={() => navigate("shop")}>
+                Start shopping
+              </button>
+              <button type="button" className="secondary-button" onClick={() => navigate("support")}>
+                Store support
+              </button>
+            </div>
+            <div className="stats-strip">
+              <span>
+                <strong>{products.length}+</strong>
+                Products
+              </span>
+              <span>
+                <strong>{categories.length - 1}</strong>
+                Categories
+              </span>
+              <span>
+                <strong>4.7</strong>
+                Avg rating
+              </span>
+            </div>
+          </div>
+          {heroProduct && (
+            <button className="hero-product" type="button" onClick={() => navigate("product", heroProduct._id)}>
+              <img src={heroProduct.image} alt={heroProduct.name} />
+              <div>
+                <span>{heroProduct.category}</span>
+                <h2>{heroProduct.name}</h2>
+                <strong>{formatPrice(heroProduct.price)}</strong>
+              </div>
+            </button>
+          )}
+        </section>
+
+        <section className="feature-grid">
+          {[
+            ["Smart search", "Find products by name, category, or description."],
+            ["Saved wishlist", "Collect products locally and return to them later."],
+            ["Fast checkout", "Cart totals, free-shipping logic, and clean order summary."],
+          ].map(([title, copy]) => (
+            <article key={title} className="feature-card">
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </section>
+
+        <SectionHeader title="Featured Products" action="View all" onAction={() => navigate("shop")} />
+        <div className="product-grid">
+          {featuredProducts.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  function ShopPage() {
+    return (
+      <>
+        <SectionHeader
+          title="Shop Catalog"
+          subtitle={loading ? "Refreshing products..." : `${visibleProducts.length} products ready`}
+        />
+        <section className="shop-toolbar">
+          <label>
+            <span>Search</span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search products"
+            />
+          </label>
+          <label>
+            <span>Category</span>
+            <select value={category} onChange={(event) => setCategory(event.target.value)}>
+              {categories.map((item) => (
+                <option key={item} value={item}>
+                  {item}
                 </option>
               ))}
             </select>
-            <input
-              className="hero-search-input"
-              type="search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Enter your search key..."
-            />
-            <button type="button" className="hero-search-button">
-              Search
-            </button>
-          </div>
-
-          <div className="topbar-meta">
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => setShowCartPanel(true)}
-              aria-label="Cart"
-            >
-              <Icon className="inline-icon" viewBox="0 0 24 24">
-                <path d="M6 7h15l-1.4 7H8.1L6 3H3" />
-                <circle cx="9" cy="19" r="1.5" />
-                <circle cx="18" cy="19" r="1.5" />
-              </Icon>
-              <span>{cartCount}</span>
-            </button>
-            <button type="button" className="icon-button" onClick={openAccountSection} aria-label="Wishlist">
-              <Icon className="inline-icon" viewBox="0 0 24 24">
-                <path d="M12 20s-7-4.4-7-10a4 4 0 017-2.7A4 4 0 0119 10c0 5.6-7 10-7 10z" />
-              </Icon>
-              <span>{isLoggedIn ? 1 : 0}</span>
-            </button>
-            <button
-              type="button"
-              className="icon-button"
-              onClick={isLoggedIn ? openAccountSection : () => openAuthPanel("login")}
-              aria-label="Account access"
-            >
-              <Icon className="inline-icon" viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="3.2" />
-                <path d="M5 20a7 7 0 0114 0" />
-              </Icon>
-              <span>{isLoggedIn ? 1 : 0}</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="nav-strip">
-          <button
-            type="button"
-            className="all-categories-button"
-            onClick={() => setMobileMenuOpen((current) => !current)}
-          >
-            <Icon className="inline-icon" viewBox="0 0 20 20">
-              <path d="M3 5h14" />
-              <path d="M3 10h14" />
-              <path d="M3 15h14" />
-            </Icon>
-            All Categories
-            <Icon className="nav-chevron" viewBox="0 0 20 20">
-              <path d="M5 7l5 6 5-6" />
-            </Icon>
-          </button>
-          <nav className="main-nav">
-            {Object.entries(navMenus).map(([label, items]) => (
-              <div
-                key={label}
-                className="nav-item"
-                onMouseEnter={() => setActiveNavMenu(label)}
-                onMouseLeave={() => setActiveNavMenu("")}
-              >
-                <a href={navLinks[label]} onFocus={() => setActiveNavMenu(label)} onBlur={() => setActiveNavMenu("")}>
-                  {label}
-                  <Icon className="nav-chevron" viewBox="0 0 20 20">
-                    <path d="M5 7l5 6 5-6" />
-                  </Icon>
-                </a>
-                {activeNavMenu === label && (
-                  <div className="nav-flyout">
-                    {items.map((item) => (
-                      <a key={item} href={navLinks[label]} className="flyout-link">
-                        {item}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
-          <div className="nav-side">
-            <span>
-              <Icon className="inline-icon" viewBox="0 0 24 24">
-                <path d="M12 3l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.7-5.2 2.7 1-5.9-4.3-4.2 5.9-.9L12 3z" />
-              </Icon>
-              Best Offer
-            </span>
-            <span>
-              <Icon className="inline-icon" viewBox="0 0 24 24">
-                <path d="M4 8l8-4 8 4v8l-8 4-8-4V8z" />
-                <path d="M12 4v16" />
-              </Icon>
-              Order Tracking
-            </span>
-          </div>
-        </div>
-
-        {mobileMenuOpen && (
-          <div className="mobile-drawer">
-            <div className="mobile-drawer-head">
-              <div>
-                <p className="eyebrow">Navigation</p>
-                <h3>Browse Nexa Store</h3>
-              </div>
-              <button
-                type="button"
-                className="secondary-button small-button"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="mobile-drawer-links">
-              {Object.keys(navMenus).map((label) => (
-                <a key={label} href={navLinks[label]} onClick={() => setMobileMenuOpen(false)}>
-                  {label}
-                </a>
-              ))}
-            </div>
-
-            <div className="mobile-drawer-categories">
-              {categories
-                .filter((category) => category !== "All")
-                .slice(0, 8)
-                .map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    className="chip"
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      setActiveCategoryPreview(category);
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    {category}
-                  </button>
-                ))}
-            </div>
-          </div>
-        )}
-
-        <div className="hero-grid marketplace-hero">
-          <aside className="category-rail">
-            {categories
-              .filter((category) => category !== "All")
-              .slice(0, 8)
-              .map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  className={`category-rail-item ${
-                    activeCategoryPreview === category ? "category-rail-item active" : ""
-                  }`}
-                  onMouseEnter={() => setActiveCategoryPreview(category)}
-                  onFocus={() => setActiveCategoryPreview(category)}
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    setActiveCategoryPreview(category);
-                  }}
-                >
-                  <span>{category}</span>
-                  <Icon className="nav-chevron" viewBox="0 0 20 20">
-                    <path d="M7 4l6 6-6 6" />
-                  </Icon>
-                </button>
-              ))}
-
-            {categoryPreviewSection && (
-              <div className="category-preview-card">
-                <p>{categoryPreviewSection.category}</p>
-                <h3>{categoryPreviewSection.products[0]?.name || "Featured picks"}</h3>
-                <span>{categoryPreviewSection.products.length} items ready to shop</span>
-                <div className="category-preview-links">
-                  {categoryPreviewSection.products.slice(0, 3).map((product) => (
-                    <button
-                      key={product._id}
-                      type="button"
-                      className="category-preview-link"
-                      onClick={() => openProductPage(product._id)}
-                    >
-                      {product.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </aside>
-
-          <section className="hero-copy">
-            {activeHeroProduct && (
-              <>
-                <p className="hero-kicker">Best of month</p>
-                <h2>
-                  A premium {activeHeroProduct.category.toLowerCase()} pick built for modern everyday life.
-                </h2>
-                <p className="hero-text">
-                  Discover high-demand pieces from Nexa Store with sharp pricing, trusted quality,
-                  and doorstep delivery across your favorite categories.
-                </p>
-
-                <div className="hero-actions">
-                  <button
-                    type="button"
-                    className="primary-button"
-                    onClick={() => openProductPage(activeHeroProduct._id)}
-                  >
-                    Shop Now
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => addToCart(activeHeroProduct)}
-                  >
-                    Add to cart
-                  </button>
-                </div>
-
-                <div className="stats-grid">
-                  <article>
-                    <strong>{products.length || detailedFallbackProducts.length}+</strong>
-                    <span>Products</span>
-                  </article>
-                  <article>
-                    <strong>{activeHeroProduct.brand || "Nexa"}</strong>
-                    <span>Featured brand</span>
-                  </article>
-                  <article>
-                    <strong>{formatPrice(activeHeroProduct.price)}</strong>
-                    <span>Current spotlight</span>
-                  </article>
-                </div>
-
-                {heroSlides.length > 1 && (
-                  <div className="hero-slider-dots">
-                    {heroSlides.map((product, index) => (
-                      <button
-                        key={product._id}
-                        type="button"
-                        className={index === heroSlideIndex ? "hero-dot active" : "hero-dot"}
-                        onClick={() => setHeroSlideIndex(index)}
-                        aria-label={`Show ${product.name}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </section>
-
-          <section className="hero-banner-card">
-            {activeHeroProduct && (
-              <>
-                <div className="hero-banner-copy">
-                  <span className="hero-banner-tag">{activeHeroProduct.category}</span>
-                  <h3>{activeHeroProduct.name}</h3>
-                  <p>{activeHeroProduct.description}</p>
-                  <strong>{formatPrice(activeHeroProduct.price)}</strong>
-                </div>
-                <img
-                  src={activeHeroProduct.image}
-                  alt={activeHeroProduct.name}
-                  className="hero-banner-image"
-                />
-              </>
-            )}
-          </section>
-
-          <aside className="promo-stack">
-            {recommendations.slice(0, 3).map((product) => (
-              <article key={product._id} className="promo-card">
-                <div>
-                  <p>{product.category}</p>
-                  <h3>{product.name}</h3>
-                  <span>From {formatPrice(product.price)}</span>
-                  <button
-                    type="button"
-                    className="promo-link"
-                    onClick={() => openProductPage(product._id)}
-                  >
-                    Shop Now
-                  </button>
-                </div>
-                <img src={product.image} alt={product.name} />
-              </article>
-            ))}
-          </aside>
-        </div>
-      </header>
-
-      {notice && <div className="toast">{notice}</div>}
-
-      {showAuthPanel && !isLoggedIn && (
-        <div className="modal-backdrop" onClick={() => setShowAuthPanel(false)}>
-          <section className="auth-modal" onClick={(event) => event.stopPropagation()}>
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Account</p>
-                <h2>{authMode === "login" ? "Welcome back" : "Create your account"}</h2>
-              </div>
-              <button
-                type="button"
-                className="secondary-button small-button"
-                onClick={() => setShowAuthPanel(false)}
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="auth-grid">
-              <div className="auth-switch">
-                <button
-                  type="button"
-                  className={authMode === "login" ? "chip active" : "chip"}
-                  onClick={() => setAuthMode("login")}
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  className={authMode === "register" ? "chip active" : "chip"}
-                  onClick={() => setAuthMode("register")}
-                >
-                  Sign up
-                </button>
-              </div>
-
-              {authMode === "login" ? (
-                <form className="stack-form" onSubmit={handleLoginSubmit}>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email address"
-                    value={loginState.email}
-                    onChange={handleLoginChange}
-                  />
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={loginState.password}
-                    onChange={handleLoginChange}
-                  />
-                  <button type="submit" className="primary-button submit-button" disabled={authLoading}>
-                    {authLoading ? "Signing in..." : "Login"}
-                  </button>
-                </form>
-              ) : (
-                <form className="stack-form" onSubmit={handleRegisterSubmit}>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Full name"
-                    value={registerState.name}
-                    onChange={handleRegisterChange}
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email address"
-                    value={registerState.email}
-                    onChange={handleRegisterChange}
-                  />
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={registerState.password}
-                    onChange={handleRegisterChange}
-                  />
-                  <button type="submit" className="primary-button submit-button" disabled={authLoading}>
-                    {authLoading ? "Creating account..." : "Create account"}
-                  </button>
-                </form>
-              )}
-            </div>
-          </section>
-        </div>
-      )}
-
-      {showCartPanel && (
-        <div className="modal-backdrop" onClick={() => setShowCartPanel(false)}>
-          <section className="cart-modal" onClick={(event) => event.stopPropagation()}>
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Cart</p>
-                <h2>Your bag</h2>
-              </div>
-              <button
-                type="button"
-                className="secondary-button small-button"
-                onClick={() => setShowCartPanel(false)}
-              >
-                Close
-              </button>
-            </div>
-
-            {cart.length === 0 ? (
-              <div className="empty-state">
-                <h3>Your cart is empty</h3>
-                <p>Add products from the catalog to begin checkout.</p>
-              </div>
-            ) : (
-              <>
-                <div className="cart-list">
-                  {cart.map((item) => (
-                    <article key={item._id} className="cart-item">
-                      <img src={item.image} alt={item.name} />
-                      <div className="cart-item-content">
-                        <h3>{item.name}</h3>
-                        <p>{formatPrice(item.price)}</p>
-                        <div className="quantity-row">
-                          <button type="button" onClick={() => updateQuantity(item._id, item.quantity - 1)}>
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button type="button" onClick={() => updateQuantity(item._id, item.quantity + 1)}>
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-
-                <div className="summary-card">
-                  <div>
-                    <span>Subtotal</span>
-                    <strong>{formatPrice(subtotal)}</strong>
-                  </div>
-                  <div>
-                    <span>Shipping</span>
-                    <strong>{shipping === 0 ? "Free" : formatPrice(shipping)}</strong>
-                  </div>
-                  <div className="summary-total">
-                    <span>Total</span>
-                    <strong>{formatPrice(total)}</strong>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="primary-button submit-button"
-                  onClick={() =>
-                    document.getElementById("cart-checkout")?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    })
-                  }
-                >
-                  Go to checkout
-                </button>
-
-                <section className="checkout-panel modal-checkout-panel" id="cart-checkout">
-                  <div className="panel-heading">
-                    <div>
-                      <p className="eyebrow">Checkout</p>
-                      <h2>Delivery details</h2>
-                    </div>
-                  </div>
-
-                  <form className="checkout-form" onSubmit={handleCheckoutSubmit}>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Full name"
-                      value={checkoutState.name}
-                      onChange={handleCheckoutChange}
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email address"
-                      value={checkoutState.email}
-                      onChange={handleCheckoutChange}
-                    />
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="Mobile number"
-                      value={checkoutState.phone}
-                      onChange={handleCheckoutChange}
-                    />
-                    <input
-                      type="text"
-                      name="address"
-                      placeholder="House no, street, area"
-                      value={checkoutState.address}
-                      onChange={handleCheckoutChange}
-                    />
-                    <div className="checkout-row">
-                      <input
-                        type="text"
-                        name="city"
-                        placeholder="City"
-                        value={checkoutState.city}
-                        onChange={handleCheckoutChange}
-                      />
-                      <input
-                        type="text"
-                        name="state"
-                        placeholder="State"
-                        value={checkoutState.state}
-                        onChange={handleCheckoutChange}
-                      />
-                    </div>
-                    <div className="checkout-row">
-                      <input
-                        type="text"
-                        name="zip"
-                        placeholder="PIN code"
-                        value={checkoutState.zip}
-                        onChange={handleCheckoutChange}
-                      />
-                      <select
-                        name="paymentMethod"
-                        value={checkoutState.paymentMethod}
-                        onChange={handleCheckoutChange}
-                        className="payment-select"
-                      >
-                        <option value="UPI">UPI</option>
-                        <option value="Card">Debit / Credit Card</option>
-                        <option value="Net Banking">Net Banking</option>
-                        <option value="Cash on Delivery">Cash on Delivery</option>
-                      </select>
-                    </div>
-                    <button type="submit" className="primary-button submit-button" disabled={placingOrder}>
-                      {placingOrder ? "Placing order..." : "Place order"}
-                    </button>
-                  </form>
-
-                  {orderPlaced && (
-                    <div className="success-card">
-                      <h3>Order confirmed</h3>
-                      <p>
-                        Order <strong>{orderPlaced.orderNumber}</strong> placed for{" "}
-                        <strong>{formatPrice(orderPlaced.total)}</strong> via {orderPlaced.paymentMethod}.
-                      </p>
-                    </div>
-                  )}
-                </section>
-              </>
-            )}
-          </section>
-        </div>
-      )}
-
-      <main className="content-grid">
-        {!isProductPage && (
-        <section className="catalog-panel" id="catalog">
-          <div className="panel-heading">
-            <div>
-              <p className="eyebrow">Catalog</p>
-              <h2>Shop by category</h2>
-              <p className="section-description">
-                Browse category-led collections with quick filters, best-value picks, and standout products in every aisle.
-              </p>
-            </div>
-            <p className="muted-text">
-              {loading
-                ? "Loading products..."
-                : `${filteredProducts.length} products across ${categorySections.length} categories`}
-            </p>
-          </div>
-
-          <div className="toolbar">
-            <input
-              className="search-input"
-              type="search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search products, categories, or keywords"
-            />
-
-            <div className="checkout-row">
-              <select
-                name="sortBy"
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value)}
-                className="payment-select"
-              >
-                <option value="newest">Newest</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-                <option value="rating_desc">Top Rated</option>
-                <option value="name_asc">Name: A to Z</option>
-              </select>
-
-              <input
-                type="number"
-                min="1000"
-                step="500"
-                value={maxPriceFilter}
-                onChange={(event) => setMaxPriceFilter(event.target.value)}
-                placeholder="Max price"
-              />
-            </div>
-
-            <div className="category-row">
-              <button
-                type="button"
-                className={featuredOnly ? "chip active" : "chip"}
-                onClick={() => setFeaturedOnly((current) => !current)}
-              >
-                {featuredOnly ? "Showing staff picks" : "Staff picks only"}
-              </button>
-            </div>
-
-            <div className="category-row">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  className={category === selectedCategory ? "chip active" : "chip"}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="catalog-sections">
-            {categorySections.length === 0 ? (
-              <div className="empty-state">
-                <h3>No products found</h3>
-                <p>Try another category or adjust your search and price filters.</p>
-              </div>
-            ) : (
-              categorySections.map((section) => (
-                <section key={section.category} className="category-section">
-                  <div className="section-heading">
-                    <div>
-                      <p className="eyebrow">Category</p>
-                      <h3>{section.category}</h3>
-                    </div>
-                    <span className="section-count">{section.products.length} products</span>
-                  </div>
-                  <div className="product-grid">
-                    {section.products.map((product) => (
-                      <article className="product-card" key={product._id}>
-                        <button
-                          type="button"
-                          className="product-preview"
-                          onClick={() => openProductPage(product._id)}
-                        >
-                          <img src={product.image} alt={product.name} />
-                        </button>
-                        <div className="product-body">
-                          <div className="product-heading">
-                            <span className="category-pill">{product.category}</span>
-                            <span className="rating-pill">
-                              {product.rating} star · {product.reviews.length} reviews
-                            </span>
-                          </div>
-                          <h3>{product.name}</h3>
-                          <p>{product.description}</p>
-                          <div className="product-footer">
-                            <div>
-                              <strong>{formatPrice(product.price)}</strong>
-                              <span>{product.stock} in stock</span>
-                            </div>
-                            <div className="product-actions">
-                              <button
-                                type="button"
-                                className="secondary-button small-button"
-                                onClick={() => openProductPage(product._id)}
-                              >
-                                Details
-                              </button>
-                              <button
-                                type="button"
-                                className="primary-button small"
-                                onClick={() => addToCart(product)}
-                                disabled={Number(product.stock || 0) <= 0}
-                              >
-                                {Number(product.stock || 0) <= 0 ? "Sold out" : "Add to cart"}
-                              </button>
-                            </div>
-                          </div>
-                          {isAdmin && (
-                            <button
-                              type="button"
-                              className="danger-button"
-                              onClick={() => handleDeleteProduct(product._id)}
-                              disabled={adminActionLoading}
-                            >
-                              Delete product
-                            </button>
-                          )}
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              ))
-            )}
-          </div>
-
-          {false && <div className="product-grid">
-            {filteredProducts.map((product) => (
-              <article className="product-card" key={product._id}>
-                <button
-                  type="button"
-                  className="product-preview"
-                  onClick={() => openProductPage(product._id)}
-                >
-                  <img src={product.image} alt={product.name} />
-                </button>
-                <div className="product-body">
-                  <div className="product-heading">
-                    <span className="category-pill">{product.category}</span>
-                    <span className="rating-pill">
-                      {product.rating} star · {product.reviews.length} reviews
-                    </span>
-                  </div>
-                  <h3>{product.name}</h3>
-                  <p>{product.description}</p>
-                  <div className="product-footer">
-                    <div>
-                      <strong>{formatPrice(product.price)}</strong>
-                      <span>{product.stock} in stock</span>
-                    </div>
-                    <div className="product-actions">
-                      <button
-                        type="button"
-                        className="secondary-button small-button"
-                        onClick={() => openProductPage(product._id)}
-                      >
-                        Details
-                      </button>
-                      <button
-                        type="button"
-                        className="primary-button small"
-                        onClick={() => addToCart(product)}
-                        disabled={Number(product.stock || 0) <= 0}
-                      >
-                        {Number(product.stock || 0) <= 0 ? "Sold out" : "Add to cart"}
-                      </button>
-                    </div>
-                  </div>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      className="danger-button"
-                      onClick={() => handleDeleteProduct(product._id)}
-                      disabled={adminActionLoading}
-                    >
-                      Delete product
-                    </button>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>}
+          </label>
+          <label>
+            <span>Sort</span>
+            <select value={sort} onChange={(event) => setSort(event.target.value)}>
+              <option value="featured">Featured</option>
+              <option value="rating">Top rated</option>
+              <option value="price-low">Price low to high</option>
+              <option value="price-high">Price high to low</option>
+            </select>
+          </label>
         </section>
-        )}
+        <div className="category-pills">
+          {categories.map((item) => (
+            <button
+              key={item}
+              className={category === item ? "active" : ""}
+              type="button"
+              onClick={() => setCategory(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+        <div className="product-grid">
+          {visibleProducts.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      </>
+    );
+  }
 
-        <aside className="sidebar">
-          {isProductPage && currentProductPage && (
-            <section className="detail-panel product-page-panel">
-              <div className="panel-heading">
-                <div>
-                  <p className="eyebrow">Product page</p>
-                  <h2>{currentProductPage.name}</h2>
-                </div>
-                <button
-                  type="button"
-                  className="secondary-button small-button"
-                  onClick={closeProductPage}
-                >
-                  Back to catalog
-                </button>
-              </div>
-              <div className="product-page-media">
-                <img
-                  src={currentProductPage.image}
-                  alt={currentProductPage.name}
-                  className="product-page-image"
-                />
-              </div>
-              <div className="detail-copy">
-                <p>{currentProductPage.description}</p>
-                <div className="detail-grid">
-                  <article>
-                    <span>Price</span>
-                    <strong>{formatPrice(currentProductPage.price)}</strong>
-                  </article>
-                  <article>
-                    <span>Category</span>
-                    <strong>{currentProductPage.category}</strong>
-                  </article>
-                  <article>
-                    <span>Rating</span>
-                    <strong>{currentProductPage.rating} / 5</strong>
-                  </article>
-                  <article>
-                    <span>Stock</span>
-                    <strong>{currentProductPage.stock} units</strong>
-                  </article>
-                </div>
-                <div className="detail-stack">
-                  <article className="detail-card">
-                    <span>Brand</span>
-                    <strong>{currentProductPage.brand || "Nexa Store"}</strong>
-                  </article>
+  function ProductPage() {
+    if (!selectedProduct) return <EmptyState title="Product not found" text="Try browsing the catalog again." />;
 
-                  {currentProductPage.highlights?.length > 0 && (
-                    <article className="detail-card">
-                      <span>Highlights</span>
-                      <ul className="detail-list">
-                        {currentProductPage.highlights.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </article>
-                  )}
+    const related = products
+      .filter((product) => product.category === selectedProduct.category && product._id !== selectedProduct._id)
+      .slice(0, 3);
 
-                  {currentProductPage.specifications?.length > 0 && (
-                    <article className="detail-card">
-                      <span>Specifications</span>
-                      <div className="spec-list">
-                        {currentProductPage.specifications.map((spec) => (
-                          <div key={`${spec.label}-${spec.value}`} className="spec-row">
-                            <strong>{spec.label}</strong>
-                            <span>{spec.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </article>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="primary-button submit-button"
-                  onClick={() => addToCart(currentProductPage)}
-                  disabled={Number(currentProductPage.stock || 0) <= 0}
-                >
-                  {Number(currentProductPage.stock || 0) <= 0 ? "Out of stock" : "Buy this now"}
-                </button>
-
-                <div className="review-panel">
-                  <div className="panel-heading compact-heading">
-                    <div>
-                      <p className="eyebrow">Reviews</p>
-                      <h2>Customer feedback</h2>
-                    </div>
-                    <span className="muted-text">{currentProductPage.reviews.length} reviews</span>
-                  </div>
-
-                  {currentProductPage.reviews.length === 0 ? (
-                    <div className="empty-state">
-                      <h3>No reviews yet</h3>
-                      <p>Be the first shopper to share feedback on this product.</p>
-                    </div>
-                  ) : (
-                    <div className="review-list">
-                      {currentProductPage.reviews
-                        .slice()
-                        .reverse()
-                        .map((review, index) => (
-                          <article
-                            key={`${review.userId || review.userName || "review"}-${index}`}
-                            className="review-card"
-                          >
-                            <div className="review-card-header">
-                              <strong>{review.userName || "Customer"}</strong>
-                              <span>{review.rating} / 5</span>
-                            </div>
-                            <p>{review.comment}</p>
-                          </article>
-                        ))}
-                    </div>
-                  )}
-
-                  {isLoggedIn ? (
-                    <form className="stack-form" onSubmit={handleReviewSubmit}>
-                      <div className="checkout-row">
-                        <select
-                          name="rating"
-                          value={reviewState.rating}
-                          onChange={handleReviewChange}
-                          className="payment-select"
-                        >
-                          <option value="5">5 stars</option>
-                          <option value="4">4 stars</option>
-                          <option value="3">3 stars</option>
-                          <option value="2">2 stars</option>
-                          <option value="1">1 star</option>
-                        </select>
-                      </div>
-                      <textarea
-                        name="comment"
-                        value={reviewState.comment}
-                        onChange={handleReviewChange}
-                        placeholder="What stood out about this product?"
-                        rows="4"
-                      />
-                      <button
-                        type="submit"
-                        className="primary-button submit-button"
-                        disabled={reviewSubmitting}
-                      >
-                        {reviewSubmitting ? "Posting review..." : "Post review"}
-                      </button>
-                    </form>
-                  ) : (
-                    <p className="muted-text">Sign in to submit a verified review.</p>
-                  )}
-                </div>
-
-                <div className="recommendations-block">
-                  <div className="panel-heading compact-heading">
-                    <div>
-                      <p className="eyebrow">Recommended</p>
-                      <h2>You may also like</h2>
-                    </div>
-                    <span className="muted-text">
-                      {recommendationsLoading ? "Loading..." : `${recommendations.length} picks`}
-                    </span>
-                  </div>
-
-                  {recommendations.length === 0 ? (
-                    <div className="empty-state">
-                      <h3>No recommendations yet</h3>
-                      <p>Select a different product to refresh suggestions.</p>
-                    </div>
-                  ) : (
-                    <div className="recommendations-list">
-                      {recommendations.map((product) => (
-                        <article key={product._id} className="recommendation-card">
-                          <button
-                            type="button"
-                            className="recommendation-media"
-                            onClick={() => openProductPage(product._id)}
-                          >
-                            <img src={product.image} alt={product.name} />
-                          </button>
-                          <div className="recommendation-copy">
-                            <div className="product-heading">
-                              <span className="category-pill">{product.category}</span>
-                              <span className="rating-pill">{product.rating} star</span>
-                            </div>
-                            <h3>{product.name}</h3>
-                            <p>{formatPrice(product.price)}</p>
-                            <div className="product-actions">
-                              <button
-                                type="button"
-                                className="secondary-button small-button"
-                                onClick={() => openProductPage(product._id)}
-                              >
-                                View
-                              </button>
-                              <button
-                                type="button"
-                                className="primary-button small"
-                                onClick={() => addToCart(product)}
-                              >
-                                Add
-                              </button>
-                            </div>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
-          )}
-
-          <section className="orders-panel">
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Recent orders</p>
-                <h2>Latest checkouts</h2>
-                <p className="section-description">
-                  Keep a quick eye on the freshest checkout activity moving through the storefront.
-                </p>
-              </div>
+    return (
+      <>
+        <section className="product-detail">
+          <div className="detail-image-wrap">
+            <img src={selectedProduct.image} alt={selectedProduct.name} />
+          </div>
+          <div className="detail-copy">
+            <span className="eyebrow">{selectedProduct.category}</span>
+            <h1>{selectedProduct.name}</h1>
+            <p>{selectedProduct.description}</p>
+            <div className="detail-price-row">
+              <strong>{formatPrice(selectedProduct.price)}</strong>
+              <span>{selectedProduct.stock || 0} in stock</span>
+              <span>{Number(selectedProduct.rating || 0).toFixed(1)} rating</span>
             </div>
-
-            {recentOrders.length === 0 ? (
-              <div className="empty-state">
-                <h3>No recent orders</h3>
-                <p>Placed orders will appear here as a quick admin-style snapshot.</p>
-              </div>
-            ) : (
-              <div className="orders-list">
-                {recentOrders.map((order) => (
-                  <article key={order.orderNumber || order._id} className="order-item">
-                    <div>
-                      <strong>{order.orderNumber || "Pending order"}</strong>
-                      <p>{order.customer?.name || "Guest customer"}</p>
-                    </div>
-                    <div className="order-meta">
-                      <span>{order.paymentMethod}</span>
-                      <strong>{formatPrice(order.total)}</strong>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {isLoggedIn && (
-          <section className="account-panel" id="account">
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Account</p>
-                <h2>Profile and orders</h2>
-                <p className="section-description">
-                  Manage your profile, track customer orders, and handle store operations from one hub.
-                </p>
-              </div>
-              <div className="panel-heading-actions">
-                {profileLoading && <span className="muted-text">Refreshing profile...</span>}
-              </div>
+            <div className="hero-actions">
+              <button type="button" className="primary-button" onClick={() => addToCart(selectedProduct)}>
+                Add to cart
+              </button>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => toggleWishlist(selectedProduct._id)}
+              >
+                {wishlist.includes(selectedProduct._id) ? "Saved" : "Save item"}
+              </button>
             </div>
+            <div className="info-grid">
+              <article>
+                <strong>Secure payments</strong>
+                <p>UPI, card, wallet, and cash on delivery ready.</p>
+              </article>
+              <article>
+                <strong>Easy returns</strong>
+                <p>Seven-day replacement window on eligible products.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <SectionHeader title="Similar Picks" />
+        <div className="product-grid compact-grid">
+          {(related.length ? related : featuredProducts).map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      </>
+    );
+  }
 
-              <div className="account-grid">
-                <div className="account-card">
-                  <h3>{authUser.name}</h3>
-                  <p>{authUser.email}</p>
-                  <span className="role-badge">{authUser.role}</span>
-                  <button type="button" className="secondary-button" onClick={handleLogout}>
-                    Logout
-                  </button>
-                </div>
-
-                <div className="order-history-block">
-                  <div className="panel-heading compact-heading">
-                    <div>
-                      <p className="eyebrow">Order history</p>
-                      <h2>{isAdmin ? "Admin order desk" : "Your orders"}</h2>
-                    </div>
-                    <button
-                      type="button"
-                      className="secondary-button small-button"
-                      onClick={() => loadOrderHistory(authToken, authUser)}
-                    >
-                      Refresh
+  function CartPage() {
+    return (
+      <section className="split-page">
+        <div>
+          <SectionHeader title="Shopping Cart" subtitle={`${cartCount} items selected`} />
+          {cart.length === 0 ? (
+            <EmptyState title="Your cart is empty" text="Add a few products from the shop page." />
+          ) : (
+            <div className="cart-list">
+              {cart.map((item) => (
+                <article key={item._id} className="cart-row">
+                  <img src={item.image} alt={item.name} />
+                  <div>
+                    <strong>{item.name}</strong>
+                    <span>{formatPrice(item.price)}</span>
+                  </div>
+                  <div className="quantity-control">
+                    <button type="button" onClick={() => updateQuantity(item._id, item.quantity - 1)}>
+                      -
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button type="button" onClick={() => updateQuantity(item._id, item.quantity + 1)}>
+                      +
                     </button>
                   </div>
-
-                  {orderHistoryLoading ? (
-                    <p className="muted-text">Loading orders...</p>
-                  ) : orderHistory.length === 0 ? (
-                    <div className="empty-state">
-                      <h3>No orders yet</h3>
-                      <p>{isAdmin ? "Customer orders will appear here." : "Your placed orders will show up here."}</p>
-                    </div>
-                  ) : (
-                    <div className="history-list">
-                      {orderHistory.map((order) => (
-                        <article key={order._id || order.orderNumber} className="history-card">
-                          <div className="history-card-top">
-                            <div>
-                              <strong>{order.orderNumber || order._id}</strong>
-                              <p>{order.customer?.name || "Guest customer"}</p>
-                            </div>
-                            <div className="order-meta">
-                              <span>{order.status}</span>
-                              <strong>{formatPrice(order.total)}</strong>
-                            </div>
-                          </div>
-
-                          <div className="history-items">
-                            {(order.items || []).map((item, index) => (
-                              <div key={`${item.productId || item.name}-${index}`} className="history-item-row">
-                                <span>
-                                  {item.name} x {item.quantity}
-                                </span>
-                                <strong>{formatPrice(Number(item.price || 0) * Number(item.quantity || 0))}</strong>
-                              </div>
-                            ))}
-                          </div>
-
-                          {isAdmin && (
-                            <div className="status-row">
-                              <span>Update status</span>
-                              <select
-                                className="payment-select"
-                                value={order.status || "Confirmed"}
-                                onChange={(event) => handleStatusChange(order._id, event.target.value)}
-                              >
-                                {adminStatusOptions.map((status) => (
-                                  <option key={status} value={status}>
-                                    {status}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {isAdmin && (
-                  <div className="admin-panel">
-                    <div className="panel-heading compact-heading">
-                      <div>
-                        <p className="eyebrow">Admin</p>
-                        <h2>Create product</h2>
-                      </div>
-                    </div>
-
-                    <form className="stack-form" onSubmit={handleAdminProductSubmit}>
-                      <input
-                        type="text"
-                        name="name"
-                        placeholder="Product name"
-                        value={adminProductState.name}
-                        onChange={handleAdminProductChange}
-                      />
-                      <div className="checkout-row">
-                        <input
-                          type="text"
-                          name="category"
-                          placeholder="Category"
-                          value={adminProductState.category}
-                          onChange={handleAdminProductChange}
-                        />
-                        <input
-                          type="number"
-                          name="stock"
-                          placeholder="Stock"
-                          value={adminProductState.stock}
-                          onChange={handleAdminProductChange}
-                        />
-                      </div>
-                      <input
-                        type="number"
-                        name="price"
-                        placeholder="Price"
-                        value={adminProductState.price}
-                        onChange={handleAdminProductChange}
-                      />
-                      <input
-                        type="text"
-                        name="image"
-                        placeholder="Image URL"
-                        value={adminProductState.image}
-                        onChange={handleAdminProductChange}
-                      />
-                      <textarea
-                        name="description"
-                        value={adminProductState.description}
-                        onChange={handleAdminProductChange}
-                        placeholder="Product description"
-                        rows="4"
-                      />
-                      <button
-                        type="submit"
-                        className="primary-button submit-button"
-                        disabled={adminActionLoading}
-                      >
-                        {adminActionLoading ? "Saving product..." : "Create product"}
-                      </button>
-                    </form>
-                  </div>
-                )}
-              </div>
-          </section>
+                </article>
+              ))}
+            </div>
           )}
-        </aside>
-      </main>
+        </div>
+        <OrderSummary buttonLabel="Checkout" onButton={() => navigate("checkout")} disabled={cart.length === 0} />
+      </section>
+    );
+  }
+
+  function CheckoutPage() {
+    return (
+      <section className="split-page">
+        <form className="checkout-form" onSubmit={handleCheckout}>
+          <SectionHeader title="Checkout" subtitle="Add delivery details to place your order." />
+          {["name", "email", "phone", "address", "city"].map((field) => (
+            <label key={field}>
+              <span>{field.charAt(0).toUpperCase() + field.slice(1)}</span>
+              <input
+                required
+                value={customer[field]}
+                onChange={(event) => setCustomer({ ...customer, [field]: event.target.value })}
+                placeholder={`Enter ${field}`}
+                type={field === "email" ? "email" : "text"}
+              />
+            </label>
+          ))}
+          <label>
+            <span>Payment method</span>
+            <select
+              value={customer.payment}
+              onChange={(event) => setCustomer({ ...customer, payment: event.target.value })}
+            >
+              <option>UPI</option>
+              <option>Card</option>
+              <option>Wallet</option>
+              <option>Cash on delivery</option>
+            </select>
+          </label>
+          <button className="primary-button submit-button" type="submit" disabled={cart.length === 0}>
+            Place order
+          </button>
+        </form>
+        <OrderSummary />
+      </section>
+    );
+  }
+
+  function AccountPage() {
+    const savedProducts = products.filter((product) => wishlist.includes(product._id));
+
+    return (
+      <>
+        <SectionHeader title="Account" subtitle="A modern customer hub for orders and saved items." />
+        <section className="account-grid">
+          <article className="profile-card">
+            <span className="eyebrow">Customer</span>
+            <h2>{customer.name || "Guest shopper"}</h2>
+            <p>{customer.email || "Sign in flow can be connected to your backend user routes."}</p>
+            {order && (
+              <div className="last-order">
+                <span>Latest order</span>
+                <strong>{order.number}</strong>
+                <small>{formatPrice(order.total)} on {order.date}</small>
+              </div>
+            )}
+          </article>
+          <article className="profile-card light">
+            <span className="eyebrow">Wishlist</span>
+            <h2>{savedProducts.length} saved items</h2>
+            <p>Items you save on product cards appear here automatically.</p>
+            <button type="button" className="secondary-button" onClick={() => navigate("shop")}>
+              Keep browsing
+            </button>
+          </article>
+        </section>
+        {savedProducts.length > 0 && (
+          <div className="product-grid compact-grid">
+            {savedProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        )}
+      </>
+    );
+  }
+
+  function SupportPage() {
+    return (
+      <>
+        <SectionHeader title="Support" subtitle="Help content, service promises, and store policies." />
+        <section className="support-grid">
+          {[
+            ["Shipping", "Free shipping on orders over Rs. 5,000 with live totals in the cart."],
+            ["Returns", "Simple seven-day replacement flow for damaged or incorrect items."],
+            ["Payments", "UPI, cards, wallets, and cash on delivery are represented in checkout."],
+            ["Business", "Admin product and order endpoints can be expanded into a full dashboard."],
+          ].map(([title, copy]) => (
+            <article key={title} className="feature-card">
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </section>
+      </>
+    );
+  }
+
+  function SectionHeader({ title, subtitle, action, onAction }) {
+    return (
+      <div className="section-header">
+        <div>
+          <span className="eyebrow">Nexa Store</span>
+          <h2>{title}</h2>
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+        {action && (
+          <button type="button" className="secondary-button" onClick={onAction}>
+            {action}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  function EmptyState({ title, text }) {
+    return (
+      <div className="empty-state">
+        <h3>{title}</h3>
+        <p>{text}</p>
+        <button type="button" className="secondary-button" onClick={() => navigate("shop")}>
+          Browse catalog
+        </button>
+      </div>
+    );
+  }
+
+  function OrderSummary({ buttonLabel, onButton, disabled }) {
+    return (
+      <aside className="summary-panel">
+        <span className="eyebrow">Order Summary</span>
+        <h2>{formatPrice(total)}</h2>
+        <div className="summary-line">
+          <span>Subtotal</span>
+          <strong>{formatPrice(subtotal)}</strong>
+        </div>
+        <div className="summary-line">
+          <span>Shipping</span>
+          <strong>{shipping === 0 ? "Free" : formatPrice(shipping)}</strong>
+        </div>
+        <div className="summary-total">
+          <span>Total</span>
+          <strong>{formatPrice(total)}</strong>
+        </div>
+        <p>
+          {subtotal >= freeShippingThreshold
+            ? "Free shipping unlocked."
+            : `${formatPrice(freeShippingThreshold - subtotal)} away from free shipping.`}
+        </p>
+        {buttonLabel && (
+          <button type="button" className="primary-button submit-button" onClick={onButton} disabled={disabled}>
+            {buttonLabel}
+          </button>
+        )}
+      </aside>
+    );
+  }
+
+  const pageMap = {
+    home: <HomePage />,
+    shop: <ShopPage />,
+    product: <ProductPage />,
+    cart: <CartPage />,
+    checkout: <CheckoutPage />,
+    account: <AccountPage />,
+    support: <SupportPage />,
+  };
+
+  return (
+    <div className="app-shell">
+      <Header />
+      <main className="page-shell">{pageMap[route.page] || <HomePage />}</main>
     </div>
   );
 }
