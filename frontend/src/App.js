@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import "./App.css";
 
 const API_BASE_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(
@@ -165,6 +168,58 @@ const navItems = [
 const shippingFee = 149;
 const freeShippingThreshold = 5000;
 
+const trustHighlights = [
+  {
+    title: "Free shipping",
+    detail: "Fast delivery on orders above ₹5,000.",
+  },
+  {
+    title: "Secure checkout",
+    detail: "Encrypted payments and trusted transaction flow.",
+  },
+  {
+    title: "24/7 support",
+    detail: "Live help and easy returns included.",
+  },
+];
+
+const homepageSliderSettings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  centerMode: true,
+  centerPadding: "140px",
+  autoplay: true,
+  autoplaySpeed: 3200,
+  pauseOnHover: true,
+  adaptiveHeight: true,
+  arrows: true,
+  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        centerPadding: "60px",
+      },
+    },
+    {
+      breakpoint: 768,
+      settings: {
+        centerPadding: "20px",
+        arrows: false,
+      },
+    },
+    {
+      breakpoint: 480,
+      settings: {
+        centerPadding: "0px",
+        arrows: false,
+      },
+    },
+  ],
+};
+
 const formatPrice = (value) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -272,6 +327,16 @@ function App() {
     [products]
   );
 
+  const homeCarouselProducts = useMemo(
+    () => [...products].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 5),
+    [products]
+  );
+
+  const trendingProducts = useMemo(
+    () => [...products].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 8),
+    [products]
+  );
+
   const selectedProduct = useMemo(
     () => products.find((product) => product._id === route.id) || products[0],
     [products, route.id]
@@ -343,9 +408,16 @@ function App() {
             <strong>{Number(product.rating || 0).toFixed(1)}</strong>
           </div>
           <h3>{product.name}</h3>
+          <div className="rating-row">
+            <span>{"★".repeat(Math.round(product.rating || 0))}</span>
+            <span>{Number(product.rating || 0).toFixed(1)}</span>
+          </div>
           <p>{product.description}</p>
           <div className="product-footer">
-            <strong>{formatPrice(product.price)}</strong>
+            <div>
+              <strong>{formatPrice(product.price)}</strong>
+              <small>{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</small>
+            </div>
             <button type="button" className="primary-button small" onClick={() => addToCart(product)}>
               Add
             </button>
@@ -391,6 +463,7 @@ function App() {
 
   function HomePage() {
     const heroProduct = featuredProducts[0] || products[0];
+    const highlightedCategories = categories.filter((item) => item !== "All").slice(0, 4);
 
     return (
       <>
@@ -400,15 +473,11 @@ function App() {
             <h1>Shop smarter with a store that feels alive.</h1>
             <p>
               Discover polished essentials across tech, fashion, home, beauty, and travel with
-              quick filters, wishlist saves, and a clean checkout flow.
+              quick filters, wishlist saves, and a premium checkout experience.
             </p>
             <div className="hero-actions">
-              <button type="button" className="primary-button" onClick={() => navigate("shop")}>
-                Start shopping
-              </button>
-              <button type="button" className="secondary-button" onClick={() => navigate("support")}>
-                Store support
-              </button>
+              <button type="button" className="primary-button" onClick={() => navigate("shop")}>Start shopping</button>
+              <button type="button" className="secondary-button" onClick={() => navigate("support")}>Store support</button>
             </div>
             <div className="stats-strip">
               <span>
@@ -420,7 +489,7 @@ function App() {
                 Categories
               </span>
               <span>
-                <strong>4.7</strong>
+                <strong>{Number(products.reduce((sum, item) => sum + Number(item.rating || 0), 0) / Math.max(products.length, 1)).toFixed(1)}</strong>
                 Avg rating
               </span>
             </div>
@@ -437,25 +506,109 @@ function App() {
           )}
         </section>
 
-        <section className="feature-grid">
-          {[
-            ["Smart search", "Find products by name, category, or description."],
-            ["Saved wishlist", "Collect products locally and return to them later."],
-            ["Fast checkout", "Cart totals, free-shipping logic, and clean order summary."],
-          ].map(([title, copy]) => (
-            <article key={title} className="feature-card">
-              <h3>{title}</h3>
-              <p>{copy}</p>
+        <section className="home-search-panel">
+          <div className="home-search-copy">
+            <span className="eyebrow">Discover quickly</span>
+            <h2>Search products or explore categories in one tap.</h2>
+          </div>
+          <div className="search-panel-controls">
+            <label>
+              <span>Search</span>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search products, brands, or features"
+              />
+            </label>
+            <label>
+              <span>Category</span>
+              <select value={category} onChange={(event) => setCategory(event.target.value)}>
+                {categories.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <SectionHeader title="Shop by category" subtitle="A quick way to filter your favorites." />
+        <div className="category-highlight-grid">
+          {highlightedCategories.map((item) => (
+            <button key={item} type="button" className="category-card" onClick={() => setCategory(item)}>
+              <span>{item.slice(0, 2).toUpperCase()}</span>
+              <div>
+                <strong>{item}</strong>
+                <p>Explore curated products</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <section className="trust-badges">
+          {trustHighlights.map((item) => (
+            <article key={item.title} className="trust-badge">
+              <strong>{item.title}</strong>
+              <p>{item.detail}</p>
             </article>
           ))}
         </section>
 
-        <SectionHeader title="Featured Products" action="View all" onAction={() => navigate("shop")} />
+        <SectionHeader
+          title="Catalog highlights"
+          subtitle="Automatic product slideshow with top-rated picks."
+          action="Browse catalog"
+          onAction={() => navigate("shop")}
+        />
+        <div className="hero-carousel-wrap">
+          <Slider {...homepageSliderSettings}>
+            {homeCarouselProducts.map((product) => (
+              <article key={product._id} className="hero-slide">
+                <div className="hero-slide-image">
+                  <img src={product.image} alt={product.name} />
+                </div>
+                <div className="hero-slide-content">
+                  <span className="eyebrow">{product.badge || "Featured"}</span>
+                  <h2>{product.name}</h2>
+                  <p>{product.description}</p>
+                  <div className="hero-slide-meta">
+                    <span>{product.category}</span>
+                    <strong>{formatPrice(product.price)}</strong>
+                  </div>
+                  <div className="hero-slide-actions">
+                    <button type="button" className="primary-button" onClick={() => navigate("product", product._id)}>
+                      View details
+                    </button>
+                    <button type="button" className="secondary-button" onClick={() => addToCart(product)}>
+                      Add to cart
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </Slider>
+        </div>
+
+        <SectionHeader title="Trending now" subtitle="Popular picks to inspire your next order." action="View all" onAction={() => navigate("shop")} />
         <div className="product-grid">
-          {featuredProducts.map((product) => (
+          {trendingProducts.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
+
+        <section className="testimonial-grid">
+          <article className="testimonial-card">
+            <span className="eyebrow">Customer review</span>
+            <p>“Nexa Store made it easy to discover products I actually wanted. The fast checkout and curated categories feel premium.”</p>
+            <strong>— Ananya, New Delhi</strong>
+          </article>
+          <article className="testimonial-card">
+            <span className="eyebrow">Shop highlight</span>
+            <p>“I love the auto-play product showcase and quick add flow—this is a beautiful, high-quality shopping homepage.”</p>
+            <strong>— Vikram, Mumbai</strong>
+          </article>
+        </section>
       </>
     );
   }

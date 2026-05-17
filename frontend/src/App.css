@@ -300,6 +300,157 @@
   font-size: clamp(1.6rem, 3vw, 2.4rem);
 }
 
+.home-search-panel {
+  display: grid;
+  gap: 18px;
+  padding: 30px;
+  margin: 32px 0;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(30, 45, 65, 0.08);
+}
+
+.home-search-copy h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1.1;
+}
+
+.search-panel-controls {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) 260px;
+}
+
+.category-highlight-grid,
+.trust-badges,
+.testimonial-grid {
+  display: grid;
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.category-highlight-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.category-card {
+  display: grid;
+  gap: 12px;
+  padding: 22px;
+  border-radius: 24px;
+  text-align: left;
+  color: #16202f;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
+  border: 1px solid rgba(13, 92, 99, 0.08);
+  cursor: pointer;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 32px rgba(13, 92, 99, 0.12);
+}
+
+.category-card span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #e5f4f1;
+  font-weight: 900;
+}
+
+.category-card p {
+  margin: 0;
+  color: #637083;
+}
+
+.trust-badges {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.trust-badge {
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(30, 45, 65, 0.08);
+}
+
+.trust-badge strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.hero-carousel-wrap {
+  margin: 0 -12px 32px;
+}
+
+.hero-slide {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 28px;
+  border-radius: 28px;
+  min-height: 420px;
+  background: linear-gradient(135deg, #f9fbff 0%, #eef6f8 100%);
+  border: 1px solid rgba(13, 92, 99, 0.08);
+}
+
+.hero-slide-image {
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+.hero-slide-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  object-fit: cover;
+}
+
+.hero-slide-content {
+  display: grid;
+  gap: 18px;
+}
+
+.hero-slide-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: #637083;
+}
+
+.hero-slide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-slide-actions .primary-button,
+.hero-slide-actions .secondary-button {
+  min-width: 150px;
+}
+
+.testimonial-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.testimonial-card {
+  padding: 28px;
+  border-radius: 28px;
+  background: #f5f8fb;
+}
+
+.testimonial-card strong {
+  display: block;
+  margin-top: 16px;
+}
+
 .feature-grid,
 .support-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -402,18 +553,32 @@
   position: relative;
   overflow: hidden;
   border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(30, 45, 65, 0.08);
+  box-shadow: 0 18px 40px rgba(23, 36, 52, 0.08);
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 54px rgba(23, 36, 52, 0.14);
 }
 
 .wishlist-button {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 16px;
   z-index: 2;
-  padding: 9px 12px;
+  padding: 10px 14px;
   border-radius: 999px;
   color: #162c46;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.96);
   font-weight: 900;
+  border: 1px solid rgba(13, 92, 99, 0.12);
+}
+
+.product-card button.wishlist-button:hover {
+  background: #e5f4f1;
 }
 
 .product-media {
@@ -450,9 +615,46 @@
   padding: 18px;
 }
 
+.product-copy h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #b25c2a;
+}
+
+.rating-row span:last-child {
+  color: #637083;
+  font-size: 0.95rem;
+}
+
 .product-meta,
 .product-footer {
   justify-content: space-between;
+}
+
+.product-copy p {
+  margin: 0;
+  line-height: 1.6;
+  color: #4b5a6c;
+  min-height: 78px;
+  overflow: hidden;
+}
+
+.product-footer {
+  align-items: flex-end;
+}
+
+.product-footer small {
+  display: block;
+  margin-top: 6px;
+  color: #637083;
+  font-size: 0.95rem;
 }
 
 .product-meta span,
