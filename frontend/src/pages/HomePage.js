@@ -21,16 +21,16 @@ export default function HomePage({
 }) {
   return (
     <>
-      
-      <SectionHeader title="Shop by category" subtitle="A quick way to filter your favorites." />
-      <CategoryCards categories={categories} setCategory={setCategory} />
-      <TrustBadges />
       <SectionHeader
         title="Catalog highlights"
         subtitle="Automatic product slideshow with top-rated picks."
         action="Browse catalog"
         onAction={() => setCategory("All")}
       />
+      <SectionHeader title="Shop by category" subtitle="A quick way to filter your favorites." />
+      <CategoryCards categories={categories} setCategory={setCategory} />
+      <TrustBadges />
+      
       <ProductCarousel products={homeCarouselProducts} onAdd={addToCart} />
       <SectionHeader title="Trending now" subtitle="Popular picks to inspire your next order." action="Browse all" onAction={() => setCategory("All")} />
       <div className="product-grid">
