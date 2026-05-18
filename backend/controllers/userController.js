@@ -65,8 +65,7 @@ try{
 
 const user = await User.findOne({email:req.body.email})
 
-if(!user) return res.status(404).json({message:"User not found"})
-
+if(user){
 const valid = await bcrypt.compare(req.body.password,user.password)
 
 if(!valid) return res.status(401).json({message:"Wrong password"})
@@ -74,7 +73,12 @@ if(!valid) return res.status(401).json({message:"Wrong password"})
 const token = jwt.sign({id:user._id,email:user.email,role:user.role,name:user.name},JWT_SECRET,{expiresIn:"7d"})
 
 return res.json({token,user:sanitizeUser(user)})
+}
+
 } catch(error){
+  console.log("Login DB error, falling back to seeded users", error)
+}
+
 const user = fallbackUsers.find((item)=> item.email === email)
 
 if(!user || user.password !== password){
@@ -84,7 +88,6 @@ return res.status(401).json({message:"Invalid email or password"})
 const token = jwt.sign({id:user._id,email:user.email,role:user.role,name:user.name},JWT_SECRET,{expiresIn:"7d"})
 
 return res.json({token,user:sanitizeUser(user)})
-}
 
 }
 
