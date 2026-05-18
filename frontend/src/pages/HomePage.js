@@ -21,30 +21,10 @@ export default function HomePage({
 }) {
   return (
     <>
-      <section className="home-search-panel">
+      <section className="home-search-panel home-search-topnote">
         <div className="home-search-copy">
-          <span className="eyebrow">Discover quickly</span>
-          <h2>Search products or explore categories in one tap.</h2>
-        </div>
-        <div className="search-panel-controls">
-          <label>
-            <span>Search</span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search products, brands, or features"
-            />
-          </label>
-          <label>
-            <span>Category</span>
-            <select value={category} onChange={(event) => setCategory(event.target.value)}>
-              {categories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </label>
+          <span className="eyebrow">Shop search</span>
+          <h2>Use the top search control to browse products instantly.</h2>
         </div>
       </section>
       <SectionHeader title="Shop by category" subtitle="A quick way to filter your favorites." />

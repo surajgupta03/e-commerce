@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios from "axios";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import "./App.css";
 import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
@@ -329,7 +331,7 @@ function App() {
   return (
     <Router>
       <div className="app-shell">
-        <Header cartCount={cartCount} loggedIn={loggedIn} onLogout={handleLogout} />
+        <Header cartCount={cartCount} loggedIn={loggedIn} onLogout={handleLogout} query={query} setQuery={setQuery} />
         <main className="page-shell">
           <Routes>
             <Route

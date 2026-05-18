@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-export default function Header({ cartCount, loggedIn, onLogout }) {
+export default function Header({ cartCount, loggedIn, onLogout, query, setQuery }) {
   const navItems = [
     { label: "Home", path: "/" },
     { label: "Shop", path: "/shop" },
@@ -30,6 +30,15 @@ export default function Header({ cartCount, loggedIn, onLogout }) {
         ))}
       </nav>
       <div className="header-actions">
+        <label className="header-search">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search products"
+          />
+          <button type="button" className="ghost-button">Search</button>
+        </label>
         <NavLink className="cart-button" to="/cart">
           Cart <span>{cartCount}</span>
         </NavLink>
