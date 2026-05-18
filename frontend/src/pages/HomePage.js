@@ -21,21 +21,7 @@ export default function HomePage({
 }) {
   return (
     <>
-      <section className="home-search-panel home-search-topnote">
-        <div className="home-search-copy">
-          <span className="eyebrow">Shop search</span>
-          <h2>Search products instantly and keep the catalog in view.</h2>
-        </div>
-        <div className="header-search">
-          <input
-            type="search"
-            placeholder="Search products, brands or categories"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <button type="button" onClick={() => setQuery("")}>Clear</button>
-        </div>
-      </section>
+      
       <SectionHeader title="Shop by category" subtitle="A quick way to filter your favorites." />
       <CategoryCards categories={categories} setCategory={setCategory} />
       <TrustBadges />
