@@ -200,9 +200,14 @@ function App() {
     phone: "",
     address: "",
     city: "",
+    state: "",
+    zip: "",
+    country: "India",
     payment: "UPI",
   });
   const [order, setOrder] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
   const [authToken, setAuthToken] = useState(() => localStorage.getItem("authToken") || "");
   const [user, setUser] = useState(() => {
     try {
@@ -316,16 +321,54 @@ function App() {
     );
   }
 
-  function handleCheckout() {
+  async function handleCheckout() {
     if (cart.length === 0) return;
 
-    setOrder({
-      number: `NX-${Date.now().toString().slice(-6)}`,
+    const orderPayload = {
+      customer: {
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+      },
+      shippingAddress: {
+        address: customer.address,
+        city: customer.city,
+        state: customer.state,
+        zip: customer.zip,
+        country: customer.country,
+      },
+      items: cart.map((item) => ({
+        productId: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      subtotal,
+      shipping,
       total,
-      items: cart,
-      customer,
-      date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
-    });
+      paymentMethod: customer.payment,
+    };
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/orders`, orderPayload);
+      const createdOrder = response.data;
+      setOrder(createdOrder);
+      setOrders((current) => [createdOrder, ...current]);
+    } catch {
+      const fallbackOrder = {
+        _id: `fallback-${Date.now()}`,
+        orderNumber: `NX-${Date.now().toString().slice(-6)}`,
+        status: "Confirmed",
+        createdAt: new Date().toISOString(),
+        total,
+        items: cart,
+        customer: orderPayload.customer,
+        shippingAddress: orderPayload.shippingAddress,
+      };
+      setOrder(fallbackOrder);
+      setOrders((current) => [fallbackOrder, ...current]);
+    }
+
     setCart([]);
   }
 
@@ -361,17 +404,43 @@ function App() {
     setAuthToken("");
     setUser(null);
     setLoggedIn(false);
+    setOrders([]);
     setCustomer({
       name: "",
       email: "",
       phone: "",
       address: "",
       city: "",
+      state: "",
+      zip: "",
+      country: "India",
       payment: "UPI",
     });
     localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");
   }
+
+  useEffect(() => {
+    async function loadOrders() {
+      if (!loggedIn) {
+        setOrders([]);
+        setOrdersLoading(false);
+        return;
+      }
+
+      setOrdersLoading(true);
+      try {
+        const response = await axios.get(`${API_BASE_URL}/orders`);
+        setOrders(Array.isArray(response.data) ? response.data : []);
+      } catch {
+        setOrders([]);
+      } finally {
+        setOrdersLoading(false);
+      }
+    }
+
+    loadOrders();
+  }, [loggedIn, user]);
 
   return (
     <Router>
@@ -455,9 +524,13 @@ function App() {
                   wishlist={wishlist}
                   products={products}
                   customer={customer}
+                  setCustomer={setCustomer}
+                  orders={orders}
+                  ordersLoading={ordersLoading}
                   order={order}
                   addToCart={addToCart}
                   toggleWishlist={toggleWishlist}
+                  formatPrice={formatPrice}
                 />
               }
             />

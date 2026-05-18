@@ -16,7 +16,7 @@ export default function CheckoutPage({ cart, customer, setCustomer, handleChecko
     <section className="split-page">
       <form className="checkout-form" onSubmit={onSubmit}>
         <SectionHeader title="Checkout" subtitle="Add delivery details to place your order." />
-        {['name', 'email', 'phone', 'address', 'city'].map((field) => (
+        {['name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'country'].map((field) => (
           <label key={field}>
             <span>{field.charAt(0).toUpperCase() + field.slice(1)}</span>
             <input
