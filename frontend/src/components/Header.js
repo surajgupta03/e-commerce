@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-export default function Header({ cartCount, loggedIn, onLogout, query, setQuery }) {
+export default function Header({ cartCount, loggedIn, onLogout, user, query, setQuery }) {
   const navItems = [
     { label: "Home", path: "/" },
     { label: "Shop", path: "/shop" },
@@ -39,6 +39,16 @@ export default function Header({ cartCount, loggedIn, onLogout, query, setQuery 
           />
           <button type="button" className="ghost-button">Search</button>
         </label>
+        {loggedIn && user && (
+          <div className="header-user">
+            <span>{user.name}</span>
+            {user.role === "admin" && (
+              <NavLink to="/admin" className="admin-badge-link">
+                <span className="admin-badge">Admin</span>
+              </NavLink>
+            )}
+          </div>
+        )}
         <NavLink className="cart-button" to="/cart">
           Cart <span>{cartCount}</span>
         </NavLink>

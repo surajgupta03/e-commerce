@@ -11,6 +11,7 @@ import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import AccountPage from "./pages/AccountPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 import LoginPage from "./pages/LoginPage";
 import SupportPage from "./pages/SupportPage";
 
@@ -202,7 +203,28 @@ function App() {
     payment: "UPI",
   });
   const [order, setOrder] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem("authToken") || "");
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("authUser")) || null;
+    } catch {
+      return null;
+    }
+  });
+  const [loggedIn, setLoggedIn] = useState(() => Boolean(localStorage.getItem("authToken")));
+
+  useEffect(() => {
+    if (authToken) {
+      axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
+    } else {
+      delete axios.defaults.headers.common.Authorization;
+    }
+  }, [authToken]);
+
+  useEffect(() => {
+    localStorage.setItem("authToken", authToken);
+    localStorage.setItem("authUser", JSON.stringify(user || {}));
+  }, [authToken, user]);
 
   useEffect(() => {
     async function loadProducts() {
@@ -307,16 +329,37 @@ function App() {
     setCart([]);
   }
 
-  function handleLogin({ name, email }) {
-    setCustomer((current) => ({
-      ...current,
-      name: name || current.name || "Shopper",
-      email,
-    }));
-    setLoggedIn(true);
+  async function handleLogin({ email, password }) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/users/login`, {
+        email,
+        password,
+      });
+
+      const { token, user: loginUser } = response.data;
+      setAuthToken(token);
+      setUser(loginUser);
+      setLoggedIn(true);
+      setCustomer((current) => ({
+        ...current,
+        name: loginUser?.name || current.name || "Shopper",
+        email: loginUser?.email || email,
+      }));
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Unable to sign in. Please try again.",
+      };
+    }
   }
 
   function handleLogout() {
+    setAuthToken("");
+    setUser(null);
     setLoggedIn(false);
     setCustomer({
       name: "",
@@ -326,12 +369,14 @@ function App() {
       city: "",
       payment: "UPI",
     });
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("authUser");
   }
 
   return (
     <Router>
       <div className="app-shell">
-        <Header cartCount={cartCount} loggedIn={loggedIn} onLogout={handleLogout} query={query} setQuery={setQuery} />
+        <Header cartCount={cartCount} loggedIn={loggedIn} onLogout={handleLogout} user={user} query={query} setQuery={setQuery} />
         <main className="page-shell">
           <Routes>
             <Route
@@ -416,6 +461,7 @@ function App() {
                 />
               }
             />
+            <Route path="/admin" element={<AdminDashboardPage user={user} />} />
             <Route path="/support" element={<SupportPage />} />
             <Route
               path="*"
