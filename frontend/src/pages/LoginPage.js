@@ -42,6 +42,9 @@ export default function LoginPage({ onLogin }) {
         <button type="submit" className="primary-button submit-button" disabled={loading}>
           {loading ? "Signing in..." : "Sign in"}
         </button>
+        <p className="form-note">
+          New customer? <button type="button" className="secondary-button" onClick={() => navigate("/register")}>Create an account</button>
+        </p>
       </form>
     </section>
   );

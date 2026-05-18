@@ -13,6 +13,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import AccountPage from "./pages/AccountPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 import SupportPage from "./pages/SupportPage";
 
 const API_BASE_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
@@ -517,6 +518,7 @@ function App() {
               }
             />
             <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+            <Route path="/register" element={<SignupPage onLogin={handleLogin} />} />
             <Route
               path="/account"
               element={
