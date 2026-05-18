@@ -1,27 +1,39 @@
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom";
 
-function ProductCard({product}){
+export default function ProductCard({ product, onAdd, onToggleWishlist, isSaved = false }) {
+  const ratingStars = "★".repeat(Math.round(product.rating || 0));
 
-return(
-
-<div className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-
-<div className="h-48 overflow-hidden">
-<img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-</div>
-
-<div className="p-4">
-<h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-<p className="text-gray-600 mb-4">${product.price}</p>
-<Link to={"/product/"+product._id} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-View Details
-</Link>
-</div>
-
-</div>
-
-)
-
+  return (
+    <article className="product-card">
+      <button className="wishlist-button" type="button" onClick={() => onToggleWishlist(product._id)}>
+        {isSaved ? "Saved" : "Save"}
+      </button>
+      <Link className="product-media" to={`/product/${product._id}`}>
+        <img src={product.image} alt={product.name} />
+        <span>{product.badge || "Featured"}</span>
+      </Link>
+      <div className="product-copy">
+        <div className="product-meta">
+          <span>{product.category}</span>
+          <strong>{Number(product.rating || 0).toFixed(1)}</strong>
+        </div>
+        <h3>{product.name}</h3>
+        <div className="rating-row">
+          <span>{ratingStars}</span>
+          <span>{Number(product.rating || 0).toFixed(1)}</span>
+        </div>
+        <p>{product.description}</p>
+        <div className="product-footer">
+          <div>
+            <strong>{new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Number(product.price || 0))}</strong>
+            <small>{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</small>
+          </div>
+          <button type="button" className="primary-button small" onClick={() => onAdd(product)}>
+            Add
+          </button>
+        </div>
+      </div>
+    </article>
+  );
 }
 
-export default ProductCard

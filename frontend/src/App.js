@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios from "axios";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import "./App.css";
+import Header from "./components/Header";
+import HomePage from "./pages/HomePage";
+import ShopPage from "./pages/ShopPage";
+import ProductPage from "./pages/ProductPage";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import AccountPage from "./pages/AccountPage";
+import SupportPage from "./pages/SupportPage";
 
-const API_BASE_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(
-  /\/$/,
-  ""
-);
+const API_BASE_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
 
 const fallbackProducts = [
   {
@@ -128,7 +131,7 @@ const fallbackProducts = [
     rating: 4.9,
     description: "Minimal pour-over kit with a matte ceramic dripper, server, and mugs.",
     image:
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085-4d71bcdd2085?auto=format&fit=crop&w=900&q=80",
     badge: "Giftable",
   },
   {
@@ -157,68 +160,8 @@ const fallbackProducts = [
   },
 ];
 
-const navItems = [
-  { label: "Home", route: "home" },
-  { label: "Shop", route: "shop" },
-  { label: "Cart", route: "cart" },
-  { label: "Account", route: "account" },
-  { label: "Support", route: "support" },
-];
-
 const shippingFee = 149;
 const freeShippingThreshold = 5000;
-
-const trustHighlights = [
-  {
-    title: "Free shipping",
-    detail: "Fast delivery on orders above ₹5,000.",
-  },
-  {
-    title: "Secure checkout",
-    detail: "Encrypted payments and trusted transaction flow.",
-  },
-  {
-    title: "24/7 support",
-    detail: "Live help and easy returns included.",
-  },
-];
-
-const homepageSliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-  centerMode: true,
-  centerPadding: "140px",
-  autoplay: true,
-  autoplaySpeed: 3200,
-  pauseOnHover: true,
-  adaptiveHeight: true,
-  arrows: true,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        centerPadding: "60px",
-      },
-    },
-    {
-      breakpoint: 768,
-      settings: {
-        centerPadding: "20px",
-        arrows: false,
-      },
-    },
-    {
-      breakpoint: 480,
-      settings: {
-        centerPadding: "0px",
-        arrows: false,
-      },
-    },
-  ],
-};
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("en-IN", {
@@ -227,19 +170,7 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0,
   }).format(Number(value || 0));
 
-function getRouteFromHash() {
-  const raw = window.location.hash.replace(/^#\/?/, "");
-  const [page = "home", id = ""] = raw.split("/");
-  return { page: page || "home", id };
-}
-
-function navigate(page, id = "") {
-  window.location.hash = id ? `#/${page}/${id}` : `#/${page}`;
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
 function App() {
-  const [route, setRoute] = useState(() => getRouteFromHash());
   const [products, setProducts] = useState(fallbackProducts);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -268,12 +199,6 @@ function App() {
     payment: "UPI",
   });
   const [order, setOrder] = useState(null);
-
-  useEffect(() => {
-    const syncRoute = () => setRoute(getRouteFromHash());
-    window.addEventListener("hashchange", syncRoute);
-    return () => window.removeEventListener("hashchange", syncRoute);
-  }, []);
 
   useEffect(() => {
     async function loadProducts() {
@@ -337,11 +262,6 @@ function App() {
     [products]
   );
 
-  const selectedProduct = useMemo(
-    () => products.find((product) => product._id === route.id) || products[0],
-    [products, route.id]
-  );
-
   const subtotal = cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
   const shipping = cart.length === 0 || subtotal >= freeShippingThreshold ? 0 : shippingFee;
   const total = subtotal + shipping;
@@ -375,8 +295,7 @@ function App() {
     );
   }
 
-  function handleCheckout(event) {
-    event.preventDefault();
+  function handleCheckout() {
     if (cart.length === 0) return;
 
     setOrder({
@@ -387,553 +306,121 @@ function App() {
       date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
     });
     setCart([]);
-    navigate("account");
   }
-
-  function ProductCard({ product }) {
-    const saved = wishlist.includes(product._id);
-
-    return (
-      <article className="product-card">
-        <button className="wishlist-button" type="button" onClick={() => toggleWishlist(product._id)}>
-          {saved ? "Saved" : "Save"}
-        </button>
-        <button className="product-media" type="button" onClick={() => navigate("product", product._id)}>
-          <img src={product.image} alt={product.name} />
-          <span>{product.badge || "Featured"}</span>
-        </button>
-        <div className="product-copy">
-          <div className="product-meta">
-            <span>{product.category}</span>
-            <strong>{Number(product.rating || 0).toFixed(1)}</strong>
-          </div>
-          <h3>{product.name}</h3>
-          <div className="rating-row">
-            <span>{"★".repeat(Math.round(product.rating || 0))}</span>
-            <span>{Number(product.rating || 0).toFixed(1)}</span>
-          </div>
-          <p>{product.description}</p>
-          <div className="product-footer">
-            <div>
-              <strong>{formatPrice(product.price)}</strong>
-              <small>{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</small>
-            </div>
-            <button type="button" className="primary-button small" onClick={() => addToCart(product)}>
-              Add
-            </button>
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  function Header() {
-    return (
-      <header className="site-header">
-        <a className="brand" href="#/home" onClick={() => navigate("home")}>
-          <span>N</span>
-          <div>
-            <strong>Nexa Store</strong>
-            <small>Modern essentials</small>
-          </div>
-        </a>
-        <nav className="nav-links" aria-label="Main navigation">
-          {navItems.map((item) => (
-            <button
-              key={item.route}
-              className={route.page === item.route ? "active" : ""}
-              type="button"
-              onClick={() => navigate(item.route)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="header-actions">
-          <button type="button" className="ghost-button" onClick={() => navigate("shop")}>
-            Browse
-          </button>
-          <button type="button" className="cart-button" onClick={() => navigate("cart")}>
-            Cart <span>{cartCount}</span>
-          </button>
-        </div>
-      </header>
-    );
-  }
-
-  function HomePage() {
-    const heroProduct = featuredProducts[0] || products[0];
-    const highlightedCategories = categories.filter((item) => item !== "All").slice(0, 4);
-
-    return (
-      <>
-        <section className="hero-section">
-          <div className="hero-copy">
-            <span className="eyebrow">Curated marketplace</span>
-            <h1>Shop smarter with a store that feels alive.</h1>
-            <p>
-              Discover polished essentials across tech, fashion, home, beauty, and travel with
-              quick filters, wishlist saves, and a premium checkout experience.
-            </p>
-            <div className="hero-actions">
-              <button type="button" className="primary-button" onClick={() => navigate("shop")}>Start shopping</button>
-              <button type="button" className="secondary-button" onClick={() => navigate("support")}>Store support</button>
-            </div>
-            <div className="stats-strip">
-              <span>
-                <strong>{products.length}+</strong>
-                Products
-              </span>
-              <span>
-                <strong>{categories.length - 1}</strong>
-                Categories
-              </span>
-              <span>
-                <strong>{Number(products.reduce((sum, item) => sum + Number(item.rating || 0), 0) / Math.max(products.length, 1)).toFixed(1)}</strong>
-                Avg rating
-              </span>
-            </div>
-          </div>
-          {heroProduct && (
-            <button className="hero-product" type="button" onClick={() => navigate("product", heroProduct._id)}>
-              <img src={heroProduct.image} alt={heroProduct.name} />
-              <div>
-                <span>{heroProduct.category}</span>
-                <h2>{heroProduct.name}</h2>
-                <strong>{formatPrice(heroProduct.price)}</strong>
-              </div>
-            </button>
-          )}
-        </section>
-
-        <section className="home-search-panel">
-          <div className="home-search-copy">
-            <span className="eyebrow">Discover quickly</span>
-            <h2>Search products or explore categories in one tap.</h2>
-          </div>
-          <div className="search-panel-controls">
-            <label>
-              <span>Search</span>
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search products, brands, or features"
-              />
-            </label>
-            <label>
-              <span>Category</span>
-              <select value={category} onChange={(event) => setCategory(event.target.value)}>
-                {categories.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </section>
-
-        <SectionHeader title="Shop by category" subtitle="A quick way to filter your favorites." />
-        <div className="category-highlight-grid">
-          {highlightedCategories.map((item) => (
-            <button key={item} type="button" className="category-card" onClick={() => setCategory(item)}>
-              <span>{item.slice(0, 2).toUpperCase()}</span>
-              <div>
-                <strong>{item}</strong>
-                <p>Explore curated products</p>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        <section className="trust-badges">
-          {trustHighlights.map((item) => (
-            <article key={item.title} className="trust-badge">
-              <strong>{item.title}</strong>
-              <p>{item.detail}</p>
-            </article>
-          ))}
-        </section>
-
-        <SectionHeader
-          title="Catalog highlights"
-          subtitle="Automatic product slideshow with top-rated picks."
-          action="Browse catalog"
-          onAction={() => navigate("shop")}
-        />
-        <div className="hero-carousel-wrap">
-          <Slider {...homepageSliderSettings}>
-            {homeCarouselProducts.map((product) => (
-              <article key={product._id} className="hero-slide">
-                <div className="hero-slide-image">
-                  <img src={product.image} alt={product.name} />
-                </div>
-                <div className="hero-slide-content">
-                  <span className="eyebrow">{product.badge || "Featured"}</span>
-                  <h2>{product.name}</h2>
-                  <p>{product.description}</p>
-                  <div className="hero-slide-meta">
-                    <span>{product.category}</span>
-                    <strong>{formatPrice(product.price)}</strong>
-                  </div>
-                  <div className="hero-slide-actions">
-                    <button type="button" className="primary-button" onClick={() => navigate("product", product._id)}>
-                      View details
-                    </button>
-                    <button type="button" className="secondary-button" onClick={() => addToCart(product)}>
-                      Add to cart
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </Slider>
-        </div>
-
-        <SectionHeader title="Trending now" subtitle="Popular picks to inspire your next order." action="View all" onAction={() => navigate("shop")} />
-        <div className="product-grid">
-          {trendingProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-
-        <section className="testimonial-grid">
-          <article className="testimonial-card">
-            <span className="eyebrow">Customer review</span>
-            <p>“Nexa Store made it easy to discover products I actually wanted. The fast checkout and curated categories feel premium.”</p>
-            <strong>— Ananya, New Delhi</strong>
-          </article>
-          <article className="testimonial-card">
-            <span className="eyebrow">Shop highlight</span>
-            <p>“I love the auto-play product showcase and quick add flow—this is a beautiful, high-quality shopping homepage.”</p>
-            <strong>— Vikram, Mumbai</strong>
-          </article>
-        </section>
-      </>
-    );
-  }
-
-  function ShopPage() {
-    return (
-      <>
-        <SectionHeader
-          title="Shop Catalog"
-          subtitle={loading ? "Refreshing products..." : `${visibleProducts.length} products ready`}
-        />
-        <section className="shop-toolbar">
-          <label>
-            <span>Search</span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search products"
-            />
-          </label>
-          <label>
-            <span>Category</span>
-            <select value={category} onChange={(event) => setCategory(event.target.value)}>
-              {categories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>Sort</span>
-            <select value={sort} onChange={(event) => setSort(event.target.value)}>
-              <option value="featured">Featured</option>
-              <option value="rating">Top rated</option>
-              <option value="price-low">Price low to high</option>
-              <option value="price-high">Price high to low</option>
-            </select>
-          </label>
-        </section>
-        <div className="category-pills">
-          {categories.map((item) => (
-            <button
-              key={item}
-              className={category === item ? "active" : ""}
-              type="button"
-              onClick={() => setCategory(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-        <div className="product-grid">
-          {visibleProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-      </>
-    );
-  }
-
-  function ProductPage() {
-    if (!selectedProduct) return <EmptyState title="Product not found" text="Try browsing the catalog again." />;
-
-    const related = products
-      .filter((product) => product.category === selectedProduct.category && product._id !== selectedProduct._id)
-      .slice(0, 3);
-
-    return (
-      <>
-        <section className="product-detail">
-          <div className="detail-image-wrap">
-            <img src={selectedProduct.image} alt={selectedProduct.name} />
-          </div>
-          <div className="detail-copy">
-            <span className="eyebrow">{selectedProduct.category}</span>
-            <h1>{selectedProduct.name}</h1>
-            <p>{selectedProduct.description}</p>
-            <div className="detail-price-row">
-              <strong>{formatPrice(selectedProduct.price)}</strong>
-              <span>{selectedProduct.stock || 0} in stock</span>
-              <span>{Number(selectedProduct.rating || 0).toFixed(1)} rating</span>
-            </div>
-            <div className="hero-actions">
-              <button type="button" className="primary-button" onClick={() => addToCart(selectedProduct)}>
-                Add to cart
-              </button>
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={() => toggleWishlist(selectedProduct._id)}
-              >
-                {wishlist.includes(selectedProduct._id) ? "Saved" : "Save item"}
-              </button>
-            </div>
-            <div className="info-grid">
-              <article>
-                <strong>Secure payments</strong>
-                <p>UPI, card, wallet, and cash on delivery ready.</p>
-              </article>
-              <article>
-                <strong>Easy returns</strong>
-                <p>Seven-day replacement window on eligible products.</p>
-              </article>
-            </div>
-          </div>
-        </section>
-        <SectionHeader title="Similar Picks" />
-        <div className="product-grid compact-grid">
-          {(related.length ? related : featuredProducts).map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-      </>
-    );
-  }
-
-  function CartPage() {
-    return (
-      <section className="split-page">
-        <div>
-          <SectionHeader title="Shopping Cart" subtitle={`${cartCount} items selected`} />
-          {cart.length === 0 ? (
-            <EmptyState title="Your cart is empty" text="Add a few products from the shop page." />
-          ) : (
-            <div className="cart-list">
-              {cart.map((item) => (
-                <article key={item._id} className="cart-row">
-                  <img src={item.image} alt={item.name} />
-                  <div>
-                    <strong>{item.name}</strong>
-                    <span>{formatPrice(item.price)}</span>
-                  </div>
-                  <div className="quantity-control">
-                    <button type="button" onClick={() => updateQuantity(item._id, item.quantity - 1)}>
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button type="button" onClick={() => updateQuantity(item._id, item.quantity + 1)}>
-                      +
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
-        <OrderSummary buttonLabel="Checkout" onButton={() => navigate("checkout")} disabled={cart.length === 0} />
-      </section>
-    );
-  }
-
-  function CheckoutPage() {
-    return (
-      <section className="split-page">
-        <form className="checkout-form" onSubmit={handleCheckout}>
-          <SectionHeader title="Checkout" subtitle="Add delivery details to place your order." />
-          {["name", "email", "phone", "address", "city"].map((field) => (
-            <label key={field}>
-              <span>{field.charAt(0).toUpperCase() + field.slice(1)}</span>
-              <input
-                required
-                value={customer[field]}
-                onChange={(event) => setCustomer({ ...customer, [field]: event.target.value })}
-                placeholder={`Enter ${field}`}
-                type={field === "email" ? "email" : "text"}
-              />
-            </label>
-          ))}
-          <label>
-            <span>Payment method</span>
-            <select
-              value={customer.payment}
-              onChange={(event) => setCustomer({ ...customer, payment: event.target.value })}
-            >
-              <option>UPI</option>
-              <option>Card</option>
-              <option>Wallet</option>
-              <option>Cash on delivery</option>
-            </select>
-          </label>
-          <button className="primary-button submit-button" type="submit" disabled={cart.length === 0}>
-            Place order
-          </button>
-        </form>
-        <OrderSummary />
-      </section>
-    );
-  }
-
-  function AccountPage() {
-    const savedProducts = products.filter((product) => wishlist.includes(product._id));
-
-    return (
-      <>
-        <SectionHeader title="Account" subtitle="A modern customer hub for orders and saved items." />
-        <section className="account-grid">
-          <article className="profile-card">
-            <span className="eyebrow">Customer</span>
-            <h2>{customer.name || "Guest shopper"}</h2>
-            <p>{customer.email || "Sign in flow can be connected to your backend user routes."}</p>
-            {order && (
-              <div className="last-order">
-                <span>Latest order</span>
-                <strong>{order.number}</strong>
-                <small>{formatPrice(order.total)} on {order.date}</small>
-              </div>
-            )}
-          </article>
-          <article className="profile-card light">
-            <span className="eyebrow">Wishlist</span>
-            <h2>{savedProducts.length} saved items</h2>
-            <p>Items you save on product cards appear here automatically.</p>
-            <button type="button" className="secondary-button" onClick={() => navigate("shop")}>
-              Keep browsing
-            </button>
-          </article>
-        </section>
-        {savedProducts.length > 0 && (
-          <div className="product-grid compact-grid">
-            {savedProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        )}
-      </>
-    );
-  }
-
-  function SupportPage() {
-    return (
-      <>
-        <SectionHeader title="Support" subtitle="Help content, service promises, and store policies." />
-        <section className="support-grid">
-          {[
-            ["Shipping", "Free shipping on orders over Rs. 5,000 with live totals in the cart."],
-            ["Returns", "Simple seven-day replacement flow for damaged or incorrect items."],
-            ["Payments", "UPI, cards, wallets, and cash on delivery are represented in checkout."],
-            ["Business", "Admin product and order endpoints can be expanded into a full dashboard."],
-          ].map(([title, copy]) => (
-            <article key={title} className="feature-card">
-              <h3>{title}</h3>
-              <p>{copy}</p>
-            </article>
-          ))}
-        </section>
-      </>
-    );
-  }
-
-  function SectionHeader({ title, subtitle, action, onAction }) {
-    return (
-      <div className="section-header">
-        <div>
-          <span className="eyebrow">Nexa Store</span>
-          <h2>{title}</h2>
-          {subtitle && <p>{subtitle}</p>}
-        </div>
-        {action && (
-          <button type="button" className="secondary-button" onClick={onAction}>
-            {action}
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  function EmptyState({ title, text }) {
-    return (
-      <div className="empty-state">
-        <h3>{title}</h3>
-        <p>{text}</p>
-        <button type="button" className="secondary-button" onClick={() => navigate("shop")}>
-          Browse catalog
-        </button>
-      </div>
-    );
-  }
-
-  function OrderSummary({ buttonLabel, onButton, disabled }) {
-    return (
-      <aside className="summary-panel">
-        <span className="eyebrow">Order Summary</span>
-        <h2>{formatPrice(total)}</h2>
-        <div className="summary-line">
-          <span>Subtotal</span>
-          <strong>{formatPrice(subtotal)}</strong>
-        </div>
-        <div className="summary-line">
-          <span>Shipping</span>
-          <strong>{shipping === 0 ? "Free" : formatPrice(shipping)}</strong>
-        </div>
-        <div className="summary-total">
-          <span>Total</span>
-          <strong>{formatPrice(total)}</strong>
-        </div>
-        <p>
-          {subtotal >= freeShippingThreshold
-            ? "Free shipping unlocked."
-            : `${formatPrice(freeShippingThreshold - subtotal)} away from free shipping.`}
-        </p>
-        {buttonLabel && (
-          <button type="button" className="primary-button submit-button" onClick={onButton} disabled={disabled}>
-            {buttonLabel}
-          </button>
-        )}
-      </aside>
-    );
-  }
-
-  const pageMap = {
-    home: <HomePage />,
-    shop: <ShopPage />,
-    product: <ProductPage />,
-    cart: <CartPage />,
-    checkout: <CheckoutPage />,
-    account: <AccountPage />,
-    support: <SupportPage />,
-  };
 
   return (
-    <div className="app-shell">
-      <Header />
-      <main className="page-shell">{pageMap[route.page] || <HomePage />}</main>
-    </div>
+    <Router>
+      <div className="app-shell">
+        <Header cartCount={cartCount} />
+        <main className="page-shell">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  products={products}
+                  categories={categories}
+                  query={query}
+                  setQuery={setQuery}
+                  category={category}
+                  setCategory={setCategory}
+                  featuredProducts={featuredProducts}
+                  homeCarouselProducts={homeCarouselProducts}
+                  trendingProducts={trendingProducts}
+                  addToCart={addToCart}
+                  wishlist={wishlist}
+                  toggleWishlist={toggleWishlist}
+                  loading={loading}
+                />
+              }
+            />
+            <Route
+              path="/shop"
+              element={
+                <ShopPage
+                  visibleProducts={visibleProducts}
+                  categories={categories}
+                  category={category}
+                  setCategory={setCategory}
+                  sort={sort}
+                  setSort={setSort}
+                  query={query}
+                  setQuery={setQuery}
+                  addToCart={addToCart}
+                  wishlist={wishlist}
+                  toggleWishlist={toggleWishlist}
+                  loading={loading}
+                />
+              }
+            />
+            <Route path="/product/:id" element={<ProductPage products={products} addToCart={addToCart} wishlist={wishlist} toggleWishlist={toggleWishlist} />} />
+            <Route
+              path="/cart"
+              element={
+                <CartPage
+                  cart={cart}
+                  updateQuantity={updateQuantity}
+                  cartCount={cartCount}
+                  subtotal={subtotal}
+                  shipping={shipping}
+                  total={total}
+                  formatPrice={formatPrice}
+                />
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <CheckoutPage
+                  cart={cart}
+                  customer={customer}
+                  setCustomer={setCustomer}
+                  handleCheckout={handleCheckout}
+                  total={total}
+                  subtotal={subtotal}
+                  shipping={shipping}
+                  formatPrice={formatPrice}
+                />
+              }
+            />
+            <Route
+              path="/account"
+              element={
+                <AccountPage
+                  wishlist={wishlist}
+                  products={products}
+                  customer={customer}
+                  order={order}
+                  addToCart={addToCart}
+                  toggleWishlist={toggleWishlist}
+                />
+              }
+            />
+            <Route path="/support" element={<SupportPage />} />
+            <Route
+              path="*"
+              element={
+                <HomePage
+                  products={products}
+                  categories={categories}
+                  query={query}
+                  setQuery={setQuery}
+                  category={category}
+                  setCategory={setCategory}
+                  featuredProducts={featuredProducts}
+                  homeCarouselProducts={homeCarouselProducts}
+                  trendingProducts={trendingProducts}
+                  addToCart={addToCart}
+                  wishlist={wishlist}
+                  toggleWishlist={toggleWishlist}
+                  loading={loading}
+                />
+              }
+            />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
