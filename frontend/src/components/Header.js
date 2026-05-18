@@ -1,14 +1,14 @@
 import { NavLink } from "react-router-dom";
 
-const navItems = [
-  { label: "Home", path: "/" },
-  { label: "Shop", path: "/shop" },
-  { label: "Cart", path: "/cart" },
-  { label: "Account", path: "/account" },
-  { label: "Support", path: "/support" },
-];
+export default function Header({ cartCount, loggedIn, onLogout }) {
+  const navItems = [
+    { label: "Home", path: "/" },
+    { label: "Shop", path: "/shop" },
+    { label: "Cart", path: "/cart" },
+    { label: loggedIn ? "Account" : "Login", path: loggedIn ? "/account" : "/login" },
+    { label: "Support", path: "/support" },
+  ];
 
-export default function Header({ cartCount }) {
   return (
     <header className="site-header">
       <NavLink className="brand" to="/">
@@ -30,12 +30,14 @@ export default function Header({ cartCount }) {
         ))}
       </nav>
       <div className="header-actions">
-        <NavLink className="ghost-button" to="/shop">
-          Browse
-        </NavLink>
         <NavLink className="cart-button" to="/cart">
           Cart <span>{cartCount}</span>
         </NavLink>
+        {loggedIn && (
+          <button type="button" className="ghost-button" onClick={onLogout}>
+            Logout
+          </button>
+        )}
       </div>
     </header>
   );

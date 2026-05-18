@@ -1,6 +1,5 @@
 import ProductCard from "../component/ProductCard";
 import SectionHeader from "../components/SectionHeader";
-import HeroSection from "../components/HeroSection";
 import ProductCarousel from "../components/ProductCarousel";
 import CategoryCards from "../components/CategoryCards";
 import TrustBadges from "../components/TrustBadges";
@@ -13,7 +12,6 @@ export default function HomePage({
   setQuery,
   category,
   setCategory,
-  featuredProducts,
   homeCarouselProducts,
   trendingProducts,
   addToCart,
@@ -21,19 +19,8 @@ export default function HomePage({
   toggleWishlist,
   loading,
 }) {
-  const heroProduct = featuredProducts[0] || products[0];
-  const averageRating = products.length
-    ? (products.reduce((sum, product) => sum + Number(product.rating || 0), 0) / products.length).toFixed(1)
-    : "0.0";
-
   return (
     <>
-      <HeroSection
-        productCount={products.length}
-        categories={categories}
-        averageRating={averageRating}
-        heroProduct={heroProduct}
-      />
       <section className="home-search-panel">
         <div className="home-search-copy">
           <span className="eyebrow">Discover quickly</span>

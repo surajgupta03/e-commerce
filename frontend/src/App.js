@@ -9,6 +9,7 @@ import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import AccountPage from "./pages/AccountPage";
+import LoginPage from "./pages/LoginPage";
 import SupportPage from "./pages/SupportPage";
 
 const API_BASE_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
@@ -199,6 +200,7 @@ function App() {
     payment: "UPI",
   });
   const [order, setOrder] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     async function loadProducts() {
@@ -246,11 +248,6 @@ function App() {
       return Number(b.rating || 0) - Number(a.rating || 0);
     });
   }, [category, products, query, sort]);
-
-  const featuredProducts = useMemo(
-    () => [...products].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 4),
-    [products]
-  );
 
   const homeCarouselProducts = useMemo(
     () => [...products].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 5),
@@ -308,10 +305,31 @@ function App() {
     setCart([]);
   }
 
+  function handleLogin({ name, email }) {
+    setCustomer((current) => ({
+      ...current,
+      name: name || current.name || "Shopper",
+      email,
+    }));
+    setLoggedIn(true);
+  }
+
+  function handleLogout() {
+    setLoggedIn(false);
+    setCustomer({
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      payment: "UPI",
+    });
+  }
+
   return (
     <Router>
       <div className="app-shell">
-        <Header cartCount={cartCount} />
+        <Header cartCount={cartCount} loggedIn={loggedIn} onLogout={handleLogout} />
         <main className="page-shell">
           <Routes>
             <Route
@@ -324,7 +342,6 @@ function App() {
                   setQuery={setQuery}
                   category={category}
                   setCategory={setCategory}
-                  featuredProducts={featuredProducts}
                   homeCarouselProducts={homeCarouselProducts}
                   trendingProducts={trendingProducts}
                   addToCart={addToCart}
@@ -383,6 +400,7 @@ function App() {
                 />
               }
             />
+            <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
             <Route
               path="/account"
               element={
@@ -407,7 +425,6 @@ function App() {
                   setQuery={setQuery}
                   category={category}
                   setCategory={setCategory}
-                  featuredProducts={featuredProducts}
                   homeCarouselProducts={homeCarouselProducts}
                   trendingProducts={trendingProducts}
                   addToCart={addToCart}
